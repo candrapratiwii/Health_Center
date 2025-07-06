@@ -57,16 +57,12 @@ const AuthProvider = ({ children }) => {
   }, [isLoggedIn, userProfile.tipe_user, navigate]);
 
   const logout = () => {
-    logoutAPI()
-      .then((resp) => {
-        if (resp?.isLoggedOut) {
-          jwtStorage.removeItem();
-          setIsLoggedIn(false);
-          setUserProfile({});
-          navigate("/login", { replace: true });
-        }
-      })
-      .catch((err) => console.log(err));
+    jwtStorage.removeItem();
+    setIsLoggedIn(false);
+    setUserProfile({});
+    navigate("/login", { replace: true });
+    // Tetap panggil API logout di background (opsional)
+    logoutAPI().catch((err) => console.log(err));
   };
 
   return (
