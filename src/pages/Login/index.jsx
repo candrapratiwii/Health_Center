@@ -7,8 +7,14 @@ import {
   Form,
   Input,
   notification,
+  Divider,
 } from "antd";
-import SignBG from "../../assets/images/2.jpg";
+import {
+  CheckCircleFilled,
+  GoogleOutlined,
+  FacebookFilled,
+  WhatsAppOutlined,
+} from "@ant-design/icons";
 import "./login.css";
 import { useState } from "react";
 
@@ -17,7 +23,7 @@ import { sendData } from "../../utils/api";
 import { useContext } from "react";
 import { AuthContext } from "../../providers/AuthProvider";
 
-const { Title } = Typography;
+const { Title, Text } = Typography;
 const { Header, Footer, Content } = Layout;
 
 const LoginPage = () => {
@@ -58,123 +64,175 @@ const LoginPage = () => {
   };
 
   return (
-    <Layout
-      className="layout-default layout-signin"
-      style={{ minHeight: "100vh" }}
-    >
+    <Layout style={{ minHeight: "100vh" }}>
       {contextHolder}
-      <Header>
-        <div className="header-col header-brand">
-          <h5>pemwebsi.com</h5>
-        </div>
-        <div className="header-col header-nav">test</div>
-        <div className="header-col header-btn">
-          <Button type="primary">Public Sites</Button>
-        </div>
-      </Header>
       <Content
-        className="signin login-container"
         style={{
+          minHeight: "100vh",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          minHeight: "80vh",
+          background: "#f5f6fa",
         }}
       >
         <Row
-          gutter={[24, 0]}
-          justify="center"
-          align="middle"
-          style={{ width: "100%", maxWidth: 900 }}
+          style={{
+            width: "100%",
+            maxWidth: 900,
+            minHeight: 500,
+            boxShadow: "0 4px 24px rgba(0,0,0,0.08)",
+            borderRadius: 20,
+            overflow: "hidden",
+            background: "#fff",
+          }}
         >
+          {/* Kiri: Welcome */}
           <Col
-            className="sign-img"
-            xs={{ span: 24 }}
-            md={{ span: 12 }}
+            xs={24}
+            md={12}
             style={{
+              background: "linear-gradient(135deg, #36d1c4 0%, #5b86e5 100%)",
+              color: "#fff",
               display: "flex",
+              flexDirection: "column",
               alignItems: "center",
+              justifyContent: "center",
+              padding: 32,
+              minHeight: 400,
+            }}
+          >
+            <CheckCircleFilled
+              style={{
+                fontSize: 64,
+                color: "#fff",
+                background: "rgba(255,255,255,0.1)",
+                borderRadius: "50%",
+                marginBottom: 24,
+              }}
+            />
+            <Title level={2} style={{ color: "#fff", marginBottom: 0 }}>
+              Selamat Datang
+            </Title>
+            <Text
+              style={{
+                color: "#fff",
+                fontSize: 16,
+                textAlign: "center",
+                marginTop: 8,
+              }}
+            >
+              Sistem Reservasi Online Puskesmas
+              <br />
+              untuk pelayanan kesehatan yang lebih mudah dan efisien
+            </Text>
+          </Col>
+          {/* Kanan: Form Login */}
+          <Col
+            xs={24}
+            md={12}
+            style={{
+              padding: 32,
+              display: "flex",
+              flexDirection: "column",
               justifyContent: "center",
             }}
           >
-            <img
-              src={SignBG}
-              alt="Login Illustration"
-              style={{
-                maxWidth: "100%",
-                height: "auto",
-                borderRadius: 16,
-                boxShadow: "0 4px 16px rgba(0,0,0,0.08)",
-                objectFit: "cover",
-                maxHeight: 400,
-              }}
-            />
-          </Col>
-          <Col xs={{ span: 24 }} md={{ span: 12 }} style={{ padding: 24 }}>
-            <div
-              style={{
-                background: "#fff",
-                borderRadius: 16,
-                boxShadow: "0 4px 16px rgba(0,0,0,0.08)",
-                padding: 32,
-              }}
-            >
-              <Title className="mb-15">Sign In</Title>
-              <Title className="font-regular text-muted" level={5}>
-                Enter your email and password to sign in
+            <div style={{ maxWidth: 350, margin: "0 auto", width: "100%" }}>
+              <Title level={2} style={{ marginBottom: 0, textAlign: "left" }}>
+                Masuk
               </Title>
+              <Text
+                style={{ color: "#555", marginBottom: 24, display: "block" }}
+              >
+                Silakan masuk ke akun Anda
+              </Text>
               <Form
                 form={form}
                 onFinish={handleLogin}
                 layout="vertical"
-                className="row-col"
+                style={{ marginTop: 16 }}
               >
                 <Form.Item
-                  className="username"
-                  label="Username"
+                  label="Email atau NIK"
                   name="username"
                   rules={[
-                    {
-                      required: true,
-                      message: "Isi username!",
-                    },
+                    { required: true, message: "Masukkan email atau NIK Anda" },
                   ]}
                 >
-                  <Input placeholder="Username" />
+                  <Input
+                    placeholder="Masukkan email atau NIK Anda"
+                    size="large"
+                  />
                 </Form.Item>
-
                 <Form.Item
-                  className="password"
-                  label="Password"
+                  label="Kata Sandi"
                   name="password"
                   rules={[
-                    {
-                      required: true,
-                      message: "Isi password!",
-                    },
+                    { required: true, message: "Masukkan kata sandi Anda" },
                   ]}
                 >
-                  <Input.Password placeholder="Password" />
+                  <Input.Password
+                    placeholder="Masukkan kata sandi Anda"
+                    size="large"
+                  />
                 </Form.Item>
-
                 <Form.Item>
                   <Button
                     type="primary"
                     htmlType="submit"
-                    style={{ width: "100%" }}
+                    style={{
+                      width: "100%",
+                      background:
+                        "linear-gradient(90deg, #36d1c4 0%, #5b86e5 100%)",
+                      border: 0,
+                    }}
                     loading={loading}
+                    size="large"
                   >
-                    SIGN IN
+                    Masuk
                   </Button>
                 </Form.Item>
               </Form>
+              <div style={{ textAlign: "right", marginBottom: 16 }}>
+                <a href="#" style={{ color: "#36d1c4" }}>
+                  Lupa kata sandi?
+                </a>
+              </div>
+              <Divider plain>Atau masuk dengan</Divider>
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "center",
+                  gap: 16,
+                  marginBottom: 16,
+                }}
+              >
+                <Button shape="circle" icon={<GoogleOutlined />} size="large" />
+                <Button
+                  shape="circle"
+                  icon={<FacebookFilled />}
+                  size="large"
+                  style={{ color: "#1877f3" }}
+                />
+                <Button
+                  shape="circle"
+                  icon={<WhatsAppOutlined />}
+                  size="large"
+                  style={{ color: "#25d366" }}
+                />
+              </div>
+              <div style={{ textAlign: "center" }}>
+                Belum punya akun?{" "}
+                <a href="#" style={{ color: "#36d1c4" }}>
+                  Daftar di sini
+                </a>
+              </div>
             </div>
           </Col>
         </Row>
       </Content>
-      <Footer>
+      <Footer style={{ textAlign: "center", background: "#f5f6fa" }}>
         <p className="copyright">
-          {" "}
           Copyright © 2024 WebfmSI.com - Powered by Universitas Pendidikan
           Ganesha
         </p>

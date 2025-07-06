@@ -1,7 +1,7 @@
 /* eslint-disable react/no-unknown-property */
 /* eslint-disable react/prop-types */
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 
 import { Row, Col, Button, Drawer, Typography, Switch } from "antd";
 
@@ -9,6 +9,7 @@ import { LogoutOutlined } from "@ant-design/icons";
 
 import { useLocation, useNavigate } from "react-router-dom";
 import styled from "styled-components";
+import { AuthContext } from "../../providers/AuthProvider";
 
 const ButtonContainer = styled.div`
   .ant-btn-primary {
@@ -82,21 +83,28 @@ function Header({
   const hideDrawer = () => setVisible(false);
 
   const navigate = useNavigate();
-
-  const doLogout = () => {
-    navigate("/login", { replace: true });
-  };
+  const { logout } = useContext(AuthContext);
 
   return (
     <>
       {/* <div className="setting-drwer" onClick={showDrawer}>
         {setting}
       </div> */}
-      <Row gutter={[24, 0]}>
+      <Row gutter={[24, 0]} align="middle">
         <Col span={24} md={8}>
           <div>SIFORS</div>
         </Col>
-        <Col span={24} md={16} className="header-control">
+        <Col
+          span={24}
+          md={16}
+          className="header-control"
+          style={{
+            display: "flex",
+            justifyContent: "flex-end",
+            alignItems: "center",
+            gap: 16,
+          }}
+        >
           <Button type="link" onClick={showDrawer}>
             {logsetting}
           </Button>
@@ -107,101 +115,99 @@ function Header({
           >
             {toggler}
           </Button>
-          <Drawer
-            className="settings-drawer"
-            mask={true}
-            width={360}
-            onClose={hideDrawer}
-            placement={placement}
-            open={visible}
-          >
-            <div layout="vertical">
-              <div className="header-top">
-                <Title level={4}>
-                  Configurator
-                  <Text className="subtitle">See our dashboard options.</Text>
-                </Title>
-              </div>
-
-              <div className="sidebar-color">
-                <Title level={5}>Sidebar Color</Title>
-                <div className="theme-color mb-2">
-                  <ButtonContainer>
-                    <Button
-                      type="primary"
-                      onClick={() => handleSidenavColor("#1890ff")}
-                    >
-                      1
-                    </Button>
-                    <Button
-                      type="success"
-                      onClick={() => handleSidenavColor("#52c41a")}
-                    >
-                      1
-                    </Button>
-                    <Button
-                      type="danger"
-                      onClick={() => handleSidenavColor("#d9363e")}
-                    >
-                      1
-                    </Button>
-                    <Button
-                      type="yellow"
-                      onClick={() => handleSidenavColor("#fadb14")}
-                    >
-                      1
-                    </Button>
-
-                    <Button
-                      type="black"
-                      onClick={() => handleSidenavColor("#111")}
-                    >
-                      1
-                    </Button>
-                  </ButtonContainer>
-                </div>
-
-                <div className="sidebarnav-color mb-2">
-                  <Title level={5}>Sidenav Type</Title>
-                  <Text>Choose between 2 different sidenav types.</Text>
-                  <ButtonContainer className="trans">
-                    <Button
-                      type={sidenavType === "transparent" ? "primary" : "white"}
-                      onClick={() => {
-                        handleSidenavType("transparent");
-                        setSidenavType("transparent");
-                      }}
-                    >
-                      TRANSPARENT
-                    </Button>
-                    <Button
-                      type={sidenavType === "white" ? "primary" : "white"}
-                      onClick={() => {
-                        handleSidenavType("#fff");
-                        setSidenavType("white");
-                      }}
-                    >
-                      WHITE
-                    </Button>
-                  </ButtonContainer>
-                </div>
-                <div className="fixed-nav mb-2">
-                  <Title level={5}>Navbar Fixed </Title>
-                  <Switch onChange={(e) => handleFixedNavbar(e)} />
-                </div>
-              </div>
-            </div>
-          </Drawer>
           <Button
             className="btn-sign-in"
             type="text"
-            onClick={() => doLogout()}
+            onClick={logout}
+            style={{ color: "#d9363e", fontWeight: 600 }}
+            title="Logout"
           >
-            <LogoutOutlined />
-            <span>Sign Out</span>
+            <LogoutOutlined /> Logout
           </Button>
         </Col>
       </Row>
+      <Drawer
+        className="settings-drawer"
+        mask={true}
+        width={360}
+        onClose={hideDrawer}
+        placement={placement}
+        open={visible}
+      >
+        <div layout="vertical">
+          <div className="header-top">
+            <Title level={4}>
+              Configurator
+              <Text className="subtitle">See our dashboard options.</Text>
+            </Title>
+          </div>
+
+          <div className="sidebar-color">
+            <Title level={5}>Sidebar Color</Title>
+            <div className="theme-color mb-2">
+              <ButtonContainer>
+                <Button
+                  type="primary"
+                  onClick={() => handleSidenavColor("#1890ff")}
+                >
+                  1
+                </Button>
+                <Button
+                  type="success"
+                  onClick={() => handleSidenavColor("#52c41a")}
+                >
+                  1
+                </Button>
+                <Button
+                  type="danger"
+                  onClick={() => handleSidenavColor("#d9363e")}
+                >
+                  1
+                </Button>
+                <Button
+                  type="yellow"
+                  onClick={() => handleSidenavColor("#fadb14")}
+                >
+                  1
+                </Button>
+
+                <Button type="black" onClick={() => handleSidenavColor("#111")}>
+                  1
+                </Button>
+              </ButtonContainer>
+            </div>
+
+            <div className="sidebarnav-color mb-2">
+              <Title level={5}>Sidenav Type</Title>
+              <Text>Choose between 2 different sidenav types.</Text>
+              <ButtonContainer className="trans">
+                <Button
+                  type={sidenavType === "transparent" ? "primary" : "white"}
+                  onClick={() => {
+                    handleSidenavType("transparent");
+                    setSidenavType("transparent");
+                  }}
+                >
+                  TRANSPARENT
+                </Button>
+                <Button
+                  type={sidenavType === "white" ? "primary" : "white"}
+                  onClick={() => {
+                    handleSidenavType("#fff");
+                    setSidenavType("white");
+                  }}
+                >
+                  WHITE
+                </Button>
+              </ButtonContainer>
+            </div>
+            <div className="fixed-nav mb-2">
+              <Title level={5}>Navbar Fixed </Title>
+              <Switch onChange={(e) => handleFixedNavbar(e)} />
+            </div>
+          </div>
+        </div>
+      </Drawer>
     </>
   );
 }
