@@ -33,7 +33,14 @@ const AuthProvider = ({ children }) => {
   };
 
   useEffect(() => {
-    getDataProfile();
+    jwtStorage.retrieveToken().then(token => {
+      if (token) {
+        getDataProfile();
+      } else {
+        setIsLoadingScreen(false);
+        setIsLoggedIn(false);
+      }
+    });
   }, []);
 
   const login = (access_token) => {

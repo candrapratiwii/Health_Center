@@ -64,22 +64,34 @@ export const getDataPrivate = async (url) => {
 };
 
 export const sendData = async (url, data) => {
+  let isFormData = data instanceof FormData;
+  let headers = new Headers({
+    "ngrok-skip-browser-warning": "69420",
+  });
+  let body = data;
+  if (!isFormData && typeof data === "object") {
+    headers.set("Content-Type", "application/json");
+    body = JSON.stringify(data);
+  }
   return fetch(REACT_APP_API_URL + url, {
     method: "POST",
-    body: data,
-    headers: new Headers({
-      "ngrok-skip-browser-warning": "69420",
-    }),
+    body,
+    headers,
   })
-    .then((response) =>
-      response.status >= 200 &&
-      response.status <= 299 &&
-      response.status !== 204
-        ? response.json()
-        : response,
-    )
-    .then((data) => data)
-    .catch((err) => console.log(err));
+    .then(async (response) => {
+      if (!response.ok) {
+        let errorMsg = "Unknown error";
+        try {
+          const errData = await response.json();
+          errorMsg = errData?.message || JSON.stringify(errData);
+        } catch (e) {}
+        throw new Error(errorMsg);
+      }
+      return response.json();
+    })
+    .catch((err) => {
+      throw err;
+    });
 };
 
 export const sendDataPrivate = async (url, data) => {

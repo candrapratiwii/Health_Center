@@ -7,60 +7,45 @@ import {
   Form,
   Input,
   notification,
-  Divider,
 } from "antd";
-import {
-  CheckCircleFilled,
-  GoogleOutlined,
-  FacebookFilled,
-  WhatsAppOutlined,
-} from "@ant-design/icons";
-import "./login.css";
+import { CheckCircleFilled } from "@ant-design/icons";
+import "../Login/login.css";
 import { useState } from "react";
-
 import { useNavigate } from "react-router-dom";
 import { sendData } from "../../utils/api";
-import { useContext } from "react";
-import { AuthContext } from "../../providers/AuthProvider";
 
 const { Title, Text } = Typography;
-const { Header, Footer, Content } = Layout;
+const { Footer, Content } = Layout;
 
-const LoginPage = () => {
-  const { login } = useContext(AuthContext);
+const RegisterPage = () => {
   const [api, contextHolder] = notification.useNotification();
   const [form] = Form.useForm();
-
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  const handleLogin = async (values) => {
+  const handleRegister = async (values) => {
     setLoading(true);
-    let formdata = new FormData();
-    formdata.append("username", values.username);
-    formdata.append("password", values.password);
-
-    sendData("/api/v1/users/login", formdata)
+    const payload = {
+      username: values.username,
+      password: values.password,
+      tipe_user: "patien",
+    };
+    sendData("/api/v1/users/register", payload)
       .then((resp) => {
         setLoading(false);
-        if (resp?.access_token) {
-          login(resp.access_token);
-        } else {
-          failedLogin();
-        }
+        api.success({
+          message: "Registrasi Berhasil",
+          description: "Akun berhasil dibuat. Silakan login.",
+        });
+        setTimeout(() => navigate("/login"), 1500);
       })
       .catch((err) => {
         setLoading(false);
-        console.log(err);
-        failedLogin();
+        api.error({
+          message: "Registrasi Gagal",
+          description: err?.message || "Terjadi kesalahan saat registrasi.",
+        });
       });
-  };
-
-  const failedLogin = () => {
-    api.error({
-      message: "Failed to Login",
-      description: "Invalid username or password",
-    });
   };
 
   return (
@@ -111,7 +96,7 @@ const LoginPage = () => {
               }}
             />
             <Title level={2} style={{ color: "#fff", marginBottom: 0 }}>
-              Selamat Datang
+              Daftar Akun Pasien
             </Title>
             <Text
               style={{
@@ -123,10 +108,10 @@ const LoginPage = () => {
             >
               Sistem Reservasi Online Puskesmas
               <br />
-              untuk pelayanan kesehatan yang lebih mudah dan efisien
+              Daftarkan akun Anda untuk mulai reservasi layanan kesehatan
             </Text>
           </Col>
-          {/* Kanan: Form Login */}
+          {/* Kanan: Form Register */}
           <Col
             xs={24}
             md={12}
@@ -139,16 +124,16 @@ const LoginPage = () => {
           >
             <div style={{ maxWidth: 350, margin: "0 auto", width: "100%" }}>
               <Title level={2} style={{ marginBottom: 0, textAlign: "left" }}>
-                Masuk
+                Daftar
               </Title>
               <Text
                 style={{ color: "#555", marginBottom: 24, display: "block" }}
               >
-                Silakan masuk ke akun Anda
+                Silakan buat akun pasien baru
               </Text>
               <Form
                 form={form}
-                onFinish={handleLogin}
+                onFinish={handleRegister}
                 layout="vertical"
                 style={{ marginTop: 16 }}
               >
@@ -189,14 +174,14 @@ const LoginPage = () => {
                     loading={loading}
                     size="large"
                   >
-                    Masuk
+                    Daftar
                   </Button>
                 </Form.Item>
               </Form>
               <div style={{ textAlign: "center" }}>
-                Belum punya akun?{" "}
-                <a href="/register" style={{ color: "#36d1c4" }}>
-                  Daftar di sini
+                Sudah punya akun?{" "}
+                <a href="/login" style={{ color: "#36d1c4" }}>
+                  Masuk di sini
                 </a>
               </div>
             </div>
@@ -212,4 +197,4 @@ const LoginPage = () => {
   );
 };
 
-export default LoginPage;
+export default RegisterPage; 

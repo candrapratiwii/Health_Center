@@ -9,6 +9,7 @@ import LoginPage from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import PrivateRoute from "./components/layout/PrivateRoute";
 import LandingPage from "./pages/LandingPage";
+import RegisterPage from "./pages/Register";
 
 // Temporary placeholder component for routes that don't have components yet
 const PlaceholderComponent = () => (
@@ -23,6 +24,7 @@ function App() {
     <Routes>
       <Route exact path="/" element={<LandingPage />} />
       <Route exact path="/login" element={<LoginPage />} />
+      <Route exact path="/register" element={<RegisterPage />} />
 
       {/* Admin Routes */}
       <Route
