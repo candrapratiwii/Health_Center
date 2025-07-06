@@ -193,34 +193,6 @@ const LoginPage = () => {
                   </Button>
                 </Form.Item>
               </Form>
-              <div style={{ textAlign: "right", marginBottom: 16 }}>
-                <a href="#" style={{ color: "#36d1c4" }}>
-                  Lupa kata sandi?
-                </a>
-              </div>
-              <Divider plain>Atau masuk dengan</Divider>
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "center",
-                  gap: 16,
-                  marginBottom: 16,
-                }}
-              >
-                <Button shape="circle" icon={<GoogleOutlined />} size="large" />
-                <Button
-                  shape="circle"
-                  icon={<FacebookFilled />}
-                  size="large"
-                  style={{ color: "#1877f3" }}
-                />
-                <Button
-                  shape="circle"
-                  icon={<WhatsAppOutlined />}
-                  size="large"
-                  style={{ color: "#25d366" }}
-                />
-              </div>
               <div style={{ textAlign: "center" }}>
                 Belum punya akun?{" "}
                 <a href="#" style={{ color: "#36d1c4" }}>
@@ -233,8 +205,7 @@ const LoginPage = () => {
       </Content>
       <Footer style={{ textAlign: "center", background: "#f5f6fa" }}>
         <p className="copyright">
-          Copyright © 2024 WebfmSI.com - Powered by Universitas Pendidikan
-          Ganesha
+          Copyright © 2025 HealthCenter - Powered by Semangat Hidup Team
         </p>
       </Footer>
     </Layout>

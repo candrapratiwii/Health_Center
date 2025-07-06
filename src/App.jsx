@@ -8,6 +8,7 @@ import "./assets/styles/adaptive.css";
 import LoginPage from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import PrivateRoute from "./components/layout/PrivateRoute";
+import LandingPage from "./pages/LandingPage";
 
 // Temporary placeholder component for routes that don't have components yet
 const PlaceholderComponent = () => (
@@ -20,7 +21,7 @@ const PlaceholderComponent = () => (
 function App() {
   return (
     <Routes>
-      <Route exact path="/" element={<LoginPage />} />
+      <Route exact path="/" element={<LandingPage />} />
       <Route exact path="/login" element={<LoginPage />} />
 
       {/* Admin Routes */}
