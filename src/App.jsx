@@ -6,10 +6,14 @@ import "./assets/styles/responsive.css";
 import "./assets/styles/adaptive.css";
 
 import LoginPage from "./pages/Login";
-import Dashboard from "./pages/Dashboard";
 import PrivateRoute from "./components/layout/PrivateRoute";
 import LandingPage from "./pages/LandingPage";
 import RegisterPage from "./pages/Register";
+import Main from './components/layout/Main';
+import DashboardPatient from './pages/Patient/Dashboard/DashboardPatient';
+import BookingPatient from './pages/Patient/Booking/BookingPatient';
+import AppointmentsPatient from './pages/Patient/Appointments/AppointmentsPatient';
+import ProfilePatient from './pages/Patient/Profile/ProfilePatient';
 
 // Temporary placeholder component for routes that don't have components yet
 const PlaceholderComponent = () => (
@@ -30,7 +34,7 @@ function App() {
       <Route
         exact
         path="/admin/dashboard"
-        element={<PrivateRoute component={<Dashboard />} />}
+        element={<PrivateRoute component={<PlaceholderComponent />} />}
       />
       <Route
         exact
@@ -67,7 +71,7 @@ function App() {
       <Route
         exact
         path="/staff/dashboard"
-        element={<PrivateRoute component={<Dashboard />} />}
+        element={<PrivateRoute component={<PlaceholderComponent />} />}
       />
       <Route
         exact
@@ -96,11 +100,6 @@ function App() {
       />
 
       {/* Legacy Routes - Redirect to dashboard */}
-      <Route
-        exact
-        path="/dashboard"
-        element={<PrivateRoute component={<Dashboard />} />}
-      />
       <Route
         exact
         path="/books"
@@ -156,6 +155,13 @@ function App() {
         path="/gallery"
         element={<PrivateRoute component={<PlaceholderComponent />} />}
       />
+      <Route path="/patien" element={<Main />}>
+        <Route index element={<DashboardPatient />} />
+        <Route path="dashboard" element={<DashboardPatient />} />
+        <Route path="booking" element={<BookingPatient />} />
+        <Route path="appointments" element={<AppointmentsPatient />} />
+        <Route path="profile" element={<ProfilePatient />} />
+      </Route>
     </Routes>
   );
 }

@@ -29,16 +29,16 @@ import {
 import { AuthContext } from "../../providers/AuthProvider";
 import AdminSidenav from "./sidenav/AdminSidenav";
 import StaffSidenav from "./sidenav/StaffSidenav";
+import PasienSidenav from "./sidenav/PasienSidenav";
 
 
 function Sidenav({ color }) {
   const { userProfile } = useContext(AuthContext);
-  // Diasumsikan userProfile.roles berisi string role, misal: 'admin', 'staff', 'pasien'
   if (!userProfile || !userProfile.tipe_user) return null;
 
   if (userProfile.tipe_user === "admin") return <AdminSidenav color={color} />;
   if (userProfile.tipe_user === "staff") return <StaffSidenav color={color} />;
-  // if (userProfile.roles === "pasien") return <PasienSidenav color={color} />;
+  if (userProfile.tipe_user === "patien" || userProfile.tipe_user === "pasien") return <PasienSidenav color={color} />;
 
   return null;
 }

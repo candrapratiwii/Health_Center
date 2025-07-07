@@ -49,20 +49,6 @@ const AuthProvider = ({ children }) => {
     // Redirect will be handled after profile is loaded
   };
 
-  // Redirect based on user type after profile is loaded
-  useEffect(() => {
-    if (isLoggedIn && userProfile.tipe_user) {
-      if (userProfile.tipe_user === "admin") {
-        navigate("/admin/dashboard", { replace: true });
-      } else if (userProfile.tipe_user === "staff") {
-        navigate("/staff/dashboard", { replace: true });
-      } else {
-        // Default fallback
-        navigate("/dashboard", { replace: true });
-      }
-    }
-  }, [isLoggedIn, userProfile.tipe_user, navigate]);
-
   const logout = () => {
     jwtStorage.removeItem();
     setIsLoggedIn(false);

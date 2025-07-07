@@ -16,7 +16,7 @@ import {
   WhatsAppOutlined,
 } from "@ant-design/icons";
 import "./login.css";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 import { useNavigate } from "react-router-dom";
 import { sendData } from "../../utils/api";
@@ -27,12 +27,26 @@ const { Title, Text } = Typography;
 const { Header, Footer, Content } = Layout;
 
 const LoginPage = () => {
-  const { login } = useContext(AuthContext);
+  const { login, userProfile, isLoggedIn } = useContext(AuthContext);
   const [api, contextHolder] = notification.useNotification();
   const [form] = Form.useForm();
 
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (isLoggedIn && userProfile.tipe_user) {
+      if (userProfile.tipe_user === "admin") {
+        navigate("/admin/dashboard", { replace: true });
+      } else if (userProfile.tipe_user === "staff") {
+        navigate("/staff/dashboard", { replace: true });
+      } else if (userProfile.tipe_user === "patien" || userProfile.tipe_user === "pasien") {
+        navigate("/patien/dashboard", { replace: true });
+      } else {
+        navigate("/", { replace: true });
+      }
+    }
+  }, [isLoggedIn, userProfile.tipe_user, navigate]);
 
   const handleLogin = async (values) => {
     setLoading(true);
