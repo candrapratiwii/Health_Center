@@ -25,30 +25,6 @@ import { getDataPrivate, deleteData } from "../../utils/api";
 
 const mainColor = "#14b8a6";
 
-const mockStaff = [
-  {
-    id: 1,
-    nama: "Ayu Lestari",
-    jabatan: "Admin",
-    status: "Aktif",
-    kontak: "ayu.lestari@puskesmas.id",
-  },
-  {
-    id: 2,
-    nama: "Budi Pratama",
-    jabatan: "Staf",
-    status: "Aktif",
-    kontak: "081234567890",
-  },
-  {
-    id: 3,
-    nama: "Citra Dewi",
-    jabatan: "Staf",
-    status: "Cuti",
-    kontak: "citra.dewi@puskesmas.id",
-  },
-];
-
 const statusTag = {
   Aktif: <Tag color="green">Aktif</Tag>,
   Cuti: <Tag color="orange">Cuti</Tag>,
@@ -72,27 +48,22 @@ const KelolaStaf = () => {
   useEffect(() => {
     getDataPrivate("/api/v1/users/").then((data) => {
       let arr = Array.isArray(data) ? data : data.data || [];
-      const staf = arr.filter((u) => u.role === "staf");
-      setStaff(staf);
+      const staff = arr.filter((u) => u.role === "staff");
+      setStaff(staff);
     });
   }, []);
 
-  const filteredStaff = staff.filter(
-    (s) =>
-      s.nama.toLowerCase().includes(search.toLowerCase()) ||
-      s.jabatan.toLowerCase().includes(search.toLowerCase()) ||
-      s.kontak.toLowerCase().includes(search.toLowerCase())
+  // Filtered staff hanya berdasarkan username
+  const filteredStaff = staff.filter((s) =>
+    s.username.toLowerCase().includes(search.toLowerCase())
   );
   const pagedStaff = filteredStaff.slice(
     (page - 1) * pageSize,
     page * pageSize
   );
 
-  // Summary
+  // Summary hanya total staff
   const totalStaff = staff.length;
-  const aktif = staff.filter((s) => s.status === "Aktif").length;
-  const cuti = staff.filter((s) => s.status === "Cuti").length;
-  const kehadiran = totalStaff > 0 ? Math.round((aktif / totalStaff) * 100) : 0;
 
   function handleAdd() {
     setEditingStaff(null);
@@ -143,8 +114,8 @@ const KelolaStaf = () => {
               // Refresh data staf
               getDataPrivate("/api/v1/users/").then((data) => {
                 let arr = Array.isArray(data) ? data : data.data || [];
-                const staf = arr.filter((u) => u.role === "staf");
-                setStaff(staf);
+                const staff = arr.filter((u) => u.role === "staff");
+                setStaff(staff);
               });
             } else {
               openNotificationWithIcon(
@@ -161,13 +132,17 @@ const KelolaStaf = () => {
           });
       } else {
         // Tambah mode
-        fetch(import.meta.env.VITE_REACT_APP_API_URL + "/api/v1/users/", {
+        fetch(import.meta.env.VITE_REACT_APP_API_URL + "/api/v1/users/register", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
             "ngrok-skip-browser-warning": "69420",
           },
-          body: JSON.stringify(payload),
+          body: JSON.stringify({
+            username: values.username,
+            password: values.password,
+            role: "staff"
+          }),
         })
           .then(async (res) => {
             setShowModal(false);
@@ -178,11 +153,11 @@ const KelolaStaf = () => {
                 "Staff",
                 "Staff berhasil ditambah!"
               );
-              // Refresh data staf
+              // Refresh data staff
               getDataPrivate("/api/v1/users/").then((data) => {
                 let arr = Array.isArray(data) ? data : data.data || [];
-                const staf = arr.filter((u) => u.role === "staf");
-                setStaff(staf);
+                const staff = arr.filter((u) => u.role === "staff");
+                setStaff(staff);
               });
             } else {
               openNotificationWithIcon(
@@ -235,7 +210,7 @@ const KelolaStaf = () => {
           Tambah Staff
         </Button>
       </div>
-      {/* Summary Cards */}
+      {/* Summary Card hanya total staff */}
       <div
         style={{ display: "flex", gap: 24, marginBottom: 24, flexWrap: "wrap" }}
       >
@@ -252,47 +227,8 @@ const KelolaStaf = () => {
           </div>
           <div style={{ color: "#888" }}>Total Staff</div>
         </Card>
-        <Card
-          style={{
-            flex: 1,
-            minWidth: 180,
-            textAlign: "center",
-            boxShadow: "0 2px 8px #0001",
-          }}
-        >
-          <div style={{ fontSize: 32, color: mainColor, fontWeight: 700 }}>
-            {aktif}
-          </div>
-          <div style={{ color: "#888" }}>Staff Aktif</div>
-        </Card>
-        <Card
-          style={{
-            flex: 1,
-            minWidth: 180,
-            textAlign: "center",
-            boxShadow: "0 2px 8px #0001",
-          }}
-        >
-          <div style={{ fontSize: 32, color: mainColor, fontWeight: 700 }}>
-            {cuti}
-          </div>
-          <div style={{ color: "#888" }}>Staff Cuti</div>
-        </Card>
-        <Card
-          style={{
-            flex: 1,
-            minWidth: 180,
-            textAlign: "center",
-            boxShadow: "0 2px 8px #0001",
-          }}
-        >
-          <div style={{ fontSize: 32, color: mainColor, fontWeight: 700 }}>
-            {kehadiran}%
-          </div>
-          <div style={{ color: "#888" }}>Kehadiran</div>
-        </Card>
       </div>
-      {/* Search Bar */}
+      {/* Search Bar hanya username */}
       <div style={{ marginBottom: 24 }}>
         <Input
           prefix={<SearchOutlined style={{ color: mainColor }} />}
@@ -354,52 +290,21 @@ const KelolaStaf = () => {
                   }}
                   size={56}
                 >
-                  {s.nama
+                  {s.username
                     .split(" ")
                     .map((n) => n[0])
                     .join("")}
                 </Avatar>
                 <div>
-                  <div style={{ fontWeight: 600, fontSize: 20 }}>{s.nama}</div>
-                  <Tag
-                    style={{
-                      background: `linear-gradient(90deg, ${mainColor} 60%, #7c3aed 100%)`,
-                      color: "#fff",
-                      fontWeight: 500,
-                      fontSize: 14,
-                      border: 0,
-                      marginTop: 4,
-                    }}
-                  >
-                    {s.jabatan}
-                  </Tag>
+                  <div style={{ fontWeight: 600, fontSize: 20 }}>{s.username}</div>
                 </div>
               </div>
-              <div
-                style={{
-                  color: "#555",
-                  marginBottom: 8,
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 8,
-                }}
-              >
-                {s.kontak.includes("@") ? (
-                  <UserOutlined style={{ color: mainColor }} />
-                ) : (
-                  <span
-                    role="img"
-                    aria-label="phone"
-                    style={{ color: mainColor }}
-                  >
-                    📱
-                  </span>
-                )}
-                <span style={{ fontSize: 15 }}>{s.kontak}</span>
-              </div>
-              <div style={{ marginBottom: 12 }}>
-                {statusTag[s.status] || <Tag>{s.status}</Tag>}
-              </div>
+              {/* Status jika ada */}
+              {s.status && (
+                <div style={{ marginBottom: 12 }}>
+                  <Tag>{s.status}</Tag>
+                </div>
+              )}
               <div
                 style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}
               >

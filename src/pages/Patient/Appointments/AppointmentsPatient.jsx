@@ -69,10 +69,10 @@ const AppointmentsPatient = () => {
   const handleCancel = async (appointment) => {
     setIsSubmitting(true);
     try {
-      // Ganti ke PUT status cancelled
-      console.log('Cancel PUT payload:', { status: 'cancelled' });
+      // Kirim status dan tanggal_reservasi yang sudah ada
       await editDataPrivatePut(`/api/v1/reservations/${appointment.id_reservasi}`, {
-        status: 'cancelled'
+        status: 'cancelled',
+        tanggal_reservasi: appointment.tanggal_reservasi
       });
       api.success({ message: 'Reservasi dibatalkan' });
       setRescheduleModal({ open: false, appointment: null });
