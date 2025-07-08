@@ -101,4 +101,24 @@
   margin-left: 0.5rem;
   letter-spacing: 2px;
   box-shadow: 0 2px 8px rgba(20,184,166,0.10);
+}
+.dashboard-header {
+  background: linear-gradient(90deg, #14b8a6 0%, #06b6d4 100%);
+  color: #fff;
+  padding: 2rem 2rem 1.2rem 2rem;
+  border-radius: 1rem;
+  box-shadow: 0 2px 8px rgba(20,184,166,0.08);
+  margin-bottom: 2rem;
+  text-align: left;
+}
+.dashboard-header h2 {
+  margin: 0 0 0.5rem 0;
+  font-size: 2rem;
+  font-weight: 700;
+}
+.dashboard-header p {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 400;
+  opacity: 0.95;
 } 

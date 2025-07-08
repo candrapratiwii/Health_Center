@@ -80,4 +80,17 @@
 }
 .appointment-actions button:hover {
   background: #e0f2fe;
+}
+.appointments-patient h3 {
+  font-size: 1.25rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+}
+.appointment-meta .queue-number {
+  display: block;
+  text-align: center;
+  font-size: 2rem;
+  font-weight: bold;
+  margin: 0.7rem auto 0 auto;
+  letter-spacing: 2px;
 } 

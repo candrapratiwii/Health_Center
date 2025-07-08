@@ -69,9 +69,11 @@ export const sendData = async (url, data) => {
     "ngrok-skip-browser-warning": "69420",
   });
   let body = data;
-  if (!isFormData && typeof data === "object") {
+  if (!isFormData) {
     headers.set("Content-Type", "application/json");
-    body = JSON.stringify(data);
+    if (typeof data !== "string") {
+      body = JSON.stringify(data);
+    }
   }
   return fetch(REACT_APP_API_URL + url, {
     method: "POST",
@@ -95,26 +97,23 @@ export const sendData = async (url, data) => {
 };
 
 export const sendDataPrivate = async (url, data) => {
-  //401 -> jwt expired, flow process to login
-  //400 -> jwt malformed
-  //204 -> No Content, but success
-  //NOTE : You must special handle for HTTP status above
-
   let token = await jwtStorage.retrieveToken();
-  const options = {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${token}`,
-      "ngrok-skip-browser-warning": "69420",
-    },
+  let headers = {
+    Authorization: `Bearer ${token}`,
+    "ngrok-skip-browser-warning": "69420",
   };
-  // Add body only if data exists
-  if (data) {
-    options.body = data;
+  let body = data;
+  if (data && !(data instanceof FormData)) {
+    headers["Content-Type"] = "application/json";
+    if (typeof data !== "string") {
+      body = JSON.stringify(data);
+    }
   }
-  console.log(options);
-
-  return fetch(REACT_APP_API_URL + url, options)
+  return fetch(REACT_APP_API_URL + url, {
+    method: "POST",
+    headers,
+    body,
+  })
     .then((response) =>
       response.status === 401
         ? { isExpiredJWT: true }

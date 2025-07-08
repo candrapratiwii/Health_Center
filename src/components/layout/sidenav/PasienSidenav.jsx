@@ -5,8 +5,7 @@ import { Home, Calendar, Clock, User } from 'lucide-react';
 const navItems = [
   { id: 'dashboard', label: 'Dashboard', icon: Home, path: '/patien/dashboard' },
   { id: 'booking', label: 'Buat Reservasi', icon: Calendar, path: '/patien/booking' },
-  { id: 'appointments', label: 'Reservasi Saya', icon: Clock, path: '/patien/appointments' },
-  { id: 'profile', label: 'Profil Saya', icon: User, path: '/patien/profile' }
+  { id: 'appointments', label: 'Reservasi Saya', icon: Clock, path: '/patien/appointments' }
 ];
 
 const PasienSidenav = () => {
@@ -39,10 +38,14 @@ const PasienSidenav = () => {
         })}
       </nav>
       <div className="sidebar-footer">
-        <div className="sidebar-user">
-          <User className="sidebar-user-icon" />
-          <span>I Made Budi</span>
-        </div>
+        <button
+          className={`sidebar-nav-item${location.pathname === '/patien/profile' ? ' active' : ''}`}
+          onClick={() => navigate('/patien/profile')}
+          style={{ width: '100%', justifyContent: 'flex-start' }}
+        >
+          <User className="sidebar-nav-icon" />
+          <span>Profil Saya</span>
+        </button>
       </div>
     </aside>
   );
