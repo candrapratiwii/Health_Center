@@ -4,7 +4,8 @@ import { Calendar, Clock, MapPin, Phone, Star, Filter, Search, X, Stethoscope, H
 import './BookingPatient.css';
 import { useContext } from 'react';
 import { AuthContext } from '../../../providers/AuthProvider';
-import { notification } from 'antd';
+import { notification, Popconfirm } from 'antd';
+import BookingFormModal from './BookingFormModal';
 
 const BookingPatient = () => {
   const [puskesmasData, setPuskesmasData] = useState([]);
@@ -22,32 +23,44 @@ const BookingPatient = () => {
   const { userProfile, isLoadingScreen } = useContext(AuthContext);
   const [api, contextHolder] = notification.useNotification();
   const [doctorsMap, setDoctorsMap] = useState({});
+  const [initialDataBooking, setInitialDataBooking] = useState({});
+  const [rescheduleData, setRescheduleData] = useState(null);
+  const [showRescheduleModal, setShowRescheduleModal] = useState(false);
 
   if (isLoadingScreen || !userProfile || !userProfile.id_user) {
     return <div>Loading user...</div>;
   }
 
+  const dummyJadwal = {
+    "Senin": { buka: "08:00", tutup: "14:00" },
+    "Selasa": { buka: "08:00", tutup: "14:00" },
+    "Rabu": { buka: "08:00", tutup: "14:00" },
+    "Kamis": { buka: "08:00", tutup: "14:00" },
+    "Jumat": { buka: "08:00", tutup: "11:00" },
+    "Sabtu": { buka: "08:00", tutup: "12:00" },
+    "Minggu": { tutup: true }
+  };
   const dummyPuskesmas = [
-    { id: 1, nama_puskesmas: "Tejakula I", alamat: "Jl. Singaraja – Amlapura, Dusu", nomor_kontak: "0362-3301240", jam_operasional: "2024-06-01T08:00:00", jam_tutup: "16:00", nama_dokter: "dr. Kadek Sari" },
-    { id: 2, nama_puskesmas: "Tejakula II", alamat: "Jl. Singaraja – Amlapura", nomor_kontak: "0362-3303242", jam_operasional: "2024-06-01T08:00:00", jam_tutup: "16:00", nama_dokter: "drg. Made Wirawan" },
-    { id: 3, nama_puskesmas: "Kubutambahan I", alamat: "Br. Dinas Kubuanyar", nomor_kontak: "0362-036221892", jam_operasional: "2024-06-01T08:00:00", jam_tutup: "16:00", nama_dokter: "dr. Putu Dewi" },
-    { id: 4, nama_puskesmas: "Kubutambahan II", alamat: "Jl. Raya Kubutambahan Kintaman", nomor_kontak: "0362-3303277", jam_operasional: "2024-06-01T08:00:00", jam_tutup: "16:00", nama_dokter: "dr. I Nyoman Agus" },
-    { id: 5, nama_puskesmas: "Sawan I", alamat: "Jl. Raya Sangsit", nomor_kontak: "0362-24960", jam_operasional: "2024-06-01T08:00:00", jam_tutup: "16:00", nama_dokter: "dr. Luh Putu" },
-    { id: 6, nama_puskesmas: "Sawan II", alamat: "Jl. Raya Sawan", nomor_kontak: "0362-3303726", jam_operasional: "2024-06-01T08:00:00", jam_tutup: "16:00", nama_dokter: "dr. Gede Arya" },
-    { id: 7, nama_puskesmas: "Buleleng I", alamat: "Jl. Ahmad Yani No. 43", nomor_kontak: "0362-081797583", jam_operasional: "2024-06-01T08:00:00", jam_tutup: "16:00", nama_dokter: "dr. Ni Komang" },
-    { id: 8, nama_puskesmas: "Buleleng II", alamat: "Jl. Singaraja-Seririt", nomor_kontak: "0362-41116", jam_operasional: "2024-06-01T08:00:00", jam_tutup: "16:00", nama_dokter: "dr. I Made Suta" },
-    { id: 9, nama_puskesmas: "Buleleng III", alamat: "Jl. Pulau Seribu", nomor_kontak: "0362-25931", jam_operasional: "2024-06-01T08:00:00", jam_tutup: "16:00", nama_dokter: "dr. Ayu Lestari" },
-    { id: 10, nama_puskesmas: "Sukasada I", alamat: "Jl. Jelantik Gingsir No. 51", nomor_kontak: "0362-23135", jam_operasional: "2024-06-01T08:00:00", jam_tutup: "16:00", nama_dokter: "dr. Komang Sari" },
-    { id: 11, nama_puskesmas: "Sukasada II", alamat: "Jl. Raya Denpasar – Singaraja", nomor_kontak: "0362-29954", jam_operasional: "2024-06-01T08:00:00", jam_tutup: "16:00", nama_dokter: "dr. Putu Eka" },
-    { id: 12, nama_puskesmas: "Banjar I", alamat: "Jl. Segara No 1", nomor_kontak: "0362-92242", jam_operasional: "2024-06-01T08:00:00", jam_tutup: "16:00", nama_dokter: "dr. Gede Wirata" },
-    { id: 13, nama_puskesmas: "Banjar II", alamat: "Dsn. Ideran", nomor_kontak: "0362-3361990", jam_operasional: "2024-06-01T08:00:00", jam_tutup: "16:00", nama_dokter: "dr. Luh Ayu" },
-    { id: 14, nama_puskesmas: "Busungbiu I", alamat: "Jl. Amerta No. 12", nomor_kontak: "0362-081236085", jam_operasional: "2024-06-01T08:00:00", jam_tutup: "16:00", nama_dokter: "dr. I Gusti Rai" },
-    { id: 15, nama_puskesmas: "Busungbiu II", alamat: "Jl. Raya Pupuan – Pekutatan", nomor_kontak: "0362-081237011", jam_operasional: "2024-06-01T08:00:00", jam_tutup: "16:00", nama_dokter: "dr. Ni Luh Sari" },
-    { id: 16, nama_puskesmas: "Seririt I", alamat: "Jl. Jendral Sudirman No. 50", nomor_kontak: "0362-21665", jam_operasional: "2024-06-01T08:00:00", jam_tutup: "16:00", nama_dokter: "dr. Komang Putra" },
-    { id: 17, nama_puskesmas: "Seririt II", alamat: "Jl. Seririt – Gilimanuk", nomor_kontak: "0362-081337888", jam_operasional: "2024-06-01T08:00:00", jam_tutup: "16:00", nama_dokter: "dr. Ayu Wulandari" },
-    { id: 18, nama_puskesmas: "Seririt III", alamat: "Jl. Raya Seririt – Pupuan", nomor_kontak: "0362-036233613", jam_operasional: "2024-06-01T08:00:00", jam_tutup: "16:00", nama_dokter: "dr. I Made Agus" },
-    { id: 19, nama_puskesmas: "Gerokgak I", alamat: "Jl. Seririt – Gilimanuk", nomor_kontak: "0362-3361389", jam_operasional: "2024-06-01T08:00:00", jam_tutup: "16:00", nama_dokter: "dr. Putu Sulastri" },
-    { id: 20, nama_puskesmas: "Gerokgak II", alamat: "Jl. Seririt – Gilimanuk", nomor_kontak: "0362-28148", jam_operasional: "2024-06-01T08:00:00", jam_tutup: "16:00", nama_dokter: "dr. Gede Sugiarta" }
+    { id: 1, nama_puskesmas: "Tejakula I", alamat: "Jl. Singaraja – Amlapura, Dusu", nomor_kontak: "0362-3301240", jam_operasional: "2024-06-01T08:00:00", jam_tutup: "16:00", nama_dokter: "dr. Kadek Sari", jadwal_operasional: dummyJadwal },
+    { id: 2, nama_puskesmas: "Tejakula II", alamat: "Jl. Singaraja – Amlapura", nomor_kontak: "0362-3303242", jam_operasional: "2024-06-01T08:00:00", jam_tutup: "16:00", nama_dokter: "drg. Made Wirawan", jadwal_operasional: dummyJadwal },
+    { id: 3, nama_puskesmas: "Kubutambahan I", alamat: "Br. Dinas Kubuanyar", nomor_kontak: "0362-036221892", jam_operasional: "2024-06-01T08:00:00", jam_tutup: "16:00", nama_dokter: "dr. Putu Dewi", jadwal_operasional: dummyJadwal },
+    { id: 4, nama_puskesmas: "Kubutambahan II", alamat: "Jl. Raya Kubutambahan Kintaman", nomor_kontak: "0362-3303277", jam_operasional: "2024-06-01T08:00:00", jam_tutup: "16:00", nama_dokter: "dr. I Nyoman Agus", jadwal_operasional: dummyJadwal },
+    { id: 5, nama_puskesmas: "Sawan I", alamat: "Jl. Raya Sangsit", nomor_kontak: "0362-24960", jam_operasional: "2024-06-01T08:00:00", jam_tutup: "16:00", nama_dokter: "dr. Luh Putu", jadwal_operasional: dummyJadwal },
+    { id: 6, nama_puskesmas: "Sawan II", alamat: "Jl. Raya Sawan", nomor_kontak: "0362-3303726", jam_operasional: "2024-06-01T08:00:00", jam_tutup: "16:00", nama_dokter: "dr. Gede Arya", jadwal_operasional: dummyJadwal },
+    { id: 7, nama_puskesmas: "Buleleng I", alamat: "Jl. Ahmad Yani No. 43", nomor_kontak: "0362-081797583", jam_operasional: "2024-06-01T08:00:00", jam_tutup: "16:00", nama_dokter: "dr. Ni Komang", jadwal_operasional: dummyJadwal },
+    { id: 8, nama_puskesmas: "Buleleng II", alamat: "Jl. Singaraja-Seririt", nomor_kontak: "0362-41116", jam_operasional: "2024-06-01T08:00:00", jam_tutup: "16:00", nama_dokter: "dr. I Made Suta", jadwal_operasional: dummyJadwal },
+    { id: 9, nama_puskesmas: "Buleleng III", alamat: "Jl. Pulau Seribu", nomor_kontak: "0362-25931", jam_operasional: "2024-06-01T08:00:00", jam_tutup: "16:00", nama_dokter: "dr. Ayu Lestari", jadwal_operasional: dummyJadwal },
+    { id: 10, nama_puskesmas: "Sukasada I", alamat: "Jl. Jelantik Gingsir No. 51", nomor_kontak: "0362-23135", jam_operasional: "2024-06-01T08:00:00", jam_tutup: "16:00", nama_dokter: "dr. Komang Sari", jadwal_operasional: dummyJadwal },
+    { id: 11, nama_puskesmas: "Sukasada II", alamat: "Jl. Raya Denpasar – Singaraja", nomor_kontak: "0362-29954", jam_operasional: "2024-06-01T08:00:00", jam_tutup: "16:00", nama_dokter: "dr. Putu Eka", jadwal_operasional: dummyJadwal },
+    { id: 12, nama_puskesmas: "Banjar I", alamat: "Jl. Segara No 1", nomor_kontak: "0362-92242", jam_operasional: "2024-06-01T08:00:00", jam_tutup: "16:00", nama_dokter: "dr. Gede Wirata", jadwal_operasional: dummyJadwal },
+    { id: 13, nama_puskesmas: "Banjar II", alamat: "Dsn. Ideran", nomor_kontak: "0362-3361990", jam_operasional: "2024-06-01T08:00:00", jam_tutup: "16:00", nama_dokter: "dr. Luh Ayu", jadwal_operasional: dummyJadwal },
+    { id: 14, nama_puskesmas: "Busungbiu I", alamat: "Jl. Amerta No. 12", nomor_kontak: "0362-081236085", jam_operasional: "2024-06-01T08:00:00", jam_tutup: "16:00", nama_dokter: "dr. I Gusti Rai", jadwal_operasional: dummyJadwal },
+    { id: 15, nama_puskesmas: "Busungbiu II", alamat: "Jl. Raya Pupuan – Pekutatan", nomor_kontak: "0362-081237011", jam_operasional: "2024-06-01T08:00:00", jam_tutup: "16:00", nama_dokter: "dr. Ni Luh Sari", jadwal_operasional: dummyJadwal },
+    { id: 16, nama_puskesmas: "Seririt I", alamat: "Jl. Jendral Sudirman No. 50", nomor_kontak: "0362-21665", jam_operasional: "2024-06-01T08:00:00", jam_tutup: "16:00", nama_dokter: "dr. Komang Putra", jadwal_operasional: dummyJadwal },
+    { id: 17, nama_puskesmas: "Seririt II", alamat: "Jl. Seririt – Gilimanuk", nomor_kontak: "0362-081337888", jam_operasional: "2024-06-01T08:00:00", jam_tutup: "16:00", nama_dokter: "dr. Ayu Wulandari", jadwal_operasional: dummyJadwal },
+    { id: 18, nama_puskesmas: "Seririt III", alamat: "Jl. Raya Seririt – Pupuan", nomor_kontak: "0362-036233613", jam_operasional: "2024-06-01T08:00:00", jam_tutup: "16:00", nama_dokter: "dr. I Made Agus", jadwal_operasional: dummyJadwal },
+    { id: 19, nama_puskesmas: "Gerokgak I", alamat: "Jl. Seririt – Gilimanuk", nomor_kontak: "0362-3361389", jam_operasional: "2024-06-01T08:00:00", jam_tutup: "16:00", nama_dokter: "dr. Putu Sulastri", jadwal_operasional: dummyJadwal },
+    { id: 20, nama_puskesmas: "Gerokgak II", alamat: "Jl. Seririt – Gilimanuk", nomor_kontak: "0362-28148", jam_operasional: "2024-06-01T08:00:00", jam_tutup: "16:00", nama_dokter: "dr. Gede Sugiarta", jadwal_operasional: dummyJadwal }
   ];
 
   const getDataPuskesmas = () => {
@@ -139,6 +152,17 @@ const BookingPatient = () => {
     return options;
   }
 
+  // Tambahkan fungsi handleCancelBooking
+  const handleCancelBooking = async (id_reservasi) => {
+    try {
+      await getDataPrivate(`/api/v1/reservations/${id_reservasi}`, 'PUT', { status: 'cancelled' });
+      api.success({ message: 'Reservasi dibatalkan' });
+      // Jika ingin refresh data, panggil getDataPuskesmas() atau handler lain di sini
+    } catch (err) {
+      api.error({ message: 'Gagal membatalkan reservasi' });
+    }
+  };
+
   return (
     <div className="booking-patient">
       {contextHolder}
@@ -182,6 +206,12 @@ const BookingPatient = () => {
                 <button
                   onClick={() => {
                     setSelectedPuskesmas(puskesmas);
+                    setInitialDataBooking({
+                      selectedPuskesmas: puskesmas,
+                      selectedLayanan: '',
+                      selectedTanggal: '',
+                      selectedJam: ''
+                    });
                     setShowBookingForm(true);
                   }}
                   className="choose-btn"
@@ -194,84 +224,108 @@ const BookingPatient = () => {
         </div>
       </div>
       {showBookingForm && selectedPuskesmas && (
-        <div className="booking-modal">
-          <div className="modal-content">
-            <div className="modal-header">
-              <h3>Buat Reservasi</h3>
-              <button onClick={() => setShowBookingForm(false)}><X /></button>
-            </div>
-            <div className="modal-body">
-              <label>Puskesmas</label>
-              <input type="text" value={selectedPuskesmas.nama_puskesmas} disabled />
-              <label>Jenis Layanan</label>
-              <select value={selectedLayanan} onChange={e => { setSelectedLayanan(e.target.value); console.log('selectedLayanan:', e.target.value); }}>
-                <option value="">Pilih layanan</option>
-                {servicesList.map(service => (
-                  <option key={service.id_layanan} value={service.id_layanan}>
-                    {service.nama_layanan}
-                  </option>
-                ))}
-              </select>
-              <label>Tanggal</label>
-              <input type="date" min={new Date().toISOString().slice(0, 10)} value={selectedTanggal} onChange={e => setSelectedTanggal(e.target.value)} />
-              <label>Jam</label>
-              <select value={selectedJam} onChange={e => setSelectedJam(e.target.value)}>
-                <option value="">Pilih jam</option>
-                {generateJamOptions(
-                  new Date(selectedPuskesmas.jam_operasional).toTimeString().slice(0,5),
-                  selectedPuskesmas.jam_tutup || '16:00'
-                ).map(jam => (
-                  <option key={jam} value={jam}>{jam}</option>
-                ))}
-              </select>
-            </div>
-            <div className="modal-actions">
-              <button onClick={() => setShowBookingForm(false)} className="cancel-btn">Batal</button>
-              <button className="submit-btn" disabled={isSubmitting || !userProfile || !userProfile.id_user} onClick={async () => {
-                if (!selectedLayanan || !selectedTanggal || !selectedJam) {
-                  api.error({ message: 'Reservasi', description: 'Lengkapi semua data reservasi!' });
-                  return;
-                }
-                setIsSubmitting(true);
-                try {
-                  console.log('User:', userProfile);
-                  console.log('selectedPuskesmas:', selectedPuskesmas);
-                  if (!selectedPuskesmas || !selectedPuskesmas.kode_faskes) {
-                    api.error({ message: 'Reservasi', description: 'Puskesmas belum dipilih!' });
-                    setIsSubmitting(false);
-                    return;
-                  }
-                  const tanggal_reservasi = selectedTanggal && selectedJam
-                    ? `${selectedTanggal} ${selectedJam}`
-                    : selectedTanggal;
-                  const payload = {
-                    id_user: userProfile.id_user,
-                    id_puskesmas: selectedPuskesmas.kode_faskes,
-                    id_layanan: parseInt(selectedLayanan, 10),
-                    tanggal_reservasi: tanggal_reservasi,
-                    status: 'pending',
-                  };
-                  console.log('Payload reservasi:', payload);
-                  await sendDataPrivate('/api/v1/reservations/', JSON.stringify(payload));
-                  const antrian = await getDataPrivate(`/api/v1/queues/${userProfile.id_user}`);
-                  api.success({
-                    message: 'Reservasi Berhasil',
-                    description: 'Nomor antrian Anda: ' + (antrian?.nomor || antrian?.no_antrian || JSON.stringify(antrian)),
-                  });
-                  setShowBookingForm(false);
-                  setSelectedLayanan("");
-                  setSelectedTanggal("");
-                  setSelectedJam("");
-                } catch (err) {
-                  api.error({ message: 'Reservasi Gagal', description: 'Reservasi gagal! Silakan coba lagi.' });
-                }
+        <BookingFormModal
+          visible={showBookingForm}
+          onClose={() => setShowBookingForm(false)}
+          onSubmit={async ({ selectedPuskesmas, selectedLayanan, selectedTanggal, selectedJam }) => {
+            if (!selectedLayanan || !selectedTanggal || !selectedJam) {
+              api.error({ message: 'Reservasi', description: 'Lengkapi semua data reservasi!' });
+              return;
+            }
+            setIsSubmitting(true);
+            try {
+              if (!selectedPuskesmas || !selectedPuskesmas.id_puskesmas) {
+                api.error({ message: 'Reservasi', description: 'Puskesmas belum dipilih!' });
                 setIsSubmitting(false);
-              }}>
-                {isSubmitting ? 'Memproses...' : 'Buat Reservasi'}
-              </button>
-            </div>
-          </div>
-        </div>
+                return;
+              }
+              // Gabungkan tanggal dan jam tanpa detik
+              const tanggal_reservasi = `${selectedTanggal}T${selectedJam}`;
+              const payload = {
+                id_user: userProfile.id_user,
+                id_puskesmas: selectedPuskesmas.id_puskesmas,
+                id_layanan: parseInt(selectedLayanan, 10),
+                tanggal_reservasi: tanggal_reservasi,
+                status: 'pending',
+              };
+              await sendDataPrivate('/api/v1/reservations/', JSON.stringify(payload));
+              api.success({
+                message: 'Reservasi Berhasil',
+                description: 'Reservasi Anda berhasil dibuat.'
+              });
+              // Coba ambil nomor antrian
+              try {
+                const antrian = await getDataPrivate(`/api/v1/queues/user/${userProfile.id_user}`);
+                const nomor = Array.isArray(antrian) ? (antrian[antrian.length-1]?.nomor_antrian) : (antrian?.nomor_antrian);
+                if (nomor) {
+                  api.info({
+                    message: 'Nomor Antrian',
+                    description: 'Nomor antrian Anda: ' + nomor
+                  });
+                } else {
+                  api.warning({
+                    message: 'Reservasi Berhasil',
+                    description: 'Reservasi berhasil, namun nomor antrian belum tersedia.'
+                  });
+                }
+              } catch (err) {
+                api.warning({
+                  message: 'Reservasi Berhasil',
+                  description: 'Reservasi berhasil, namun gagal mengambil nomor antrian.'
+                });
+              }
+              setShowBookingForm(false);
+              setSelectedLayanan("");
+              setSelectedTanggal("");
+              setSelectedJam("");
+            } catch (err) {
+              api.error({ message: 'Reservasi Gagal', description: 'Reservasi gagal! Silakan coba lagi.' });
+            }
+            setIsSubmitting(false);
+          }}
+          puskesmasList={filteredPuskesmas}
+          servicesList={servicesList}
+          isSubmitting={isSubmitting}
+          mode="add"
+          initialData={initialDataBooking}
+        />
+      )}
+      {showRescheduleModal && rescheduleData && (
+        <BookingFormModal
+          visible={showRescheduleModal}
+          onClose={() => setShowRescheduleModal(false)}
+          initialData={rescheduleData && puskesmasData.length ? {
+            selectedPuskesmas: puskesmasData.find(
+              p => String(p.id_puskesmas) === String(rescheduleData.id_puskesmas)
+            ),
+            selectedLayanan: String(rescheduleData.id_layanan),
+            selectedTanggal: rescheduleData.tanggal_reservasi
+              ? new Date(rescheduleData.tanggal_reservasi).toISOString().slice(0, 10)
+              : '',
+            selectedJam: rescheduleData.waktu_antrian || ''
+          } : {}}
+          puskesmasList={puskesmasData}
+          servicesList={servicesList}
+          isSubmitting={isSubmitting}
+          mode="edit"
+          onSubmit={async ({ selectedPuskesmas, selectedLayanan, selectedTanggal, selectedJam }) => {
+            setIsSubmitting(true);
+            try {
+              await sendDataPrivate(`/api/v1/reservations/${rescheduleData.id_reservasi}`, JSON.stringify({
+                id_puskesmas: selectedPuskesmas.id_puskesmas,
+                id_layanan: parseInt(selectedLayanan, 10),
+                tanggal_reservasi: `${selectedTanggal}T${selectedJam}`
+              }), 'PUT');
+              api.success({ message: 'Reservasi berhasil diubah' });
+              setShowRescheduleModal(false);
+              setRescheduleData(null);
+              // refresh data jika perlu
+            } catch (err) {
+              api.error({ message: 'Gagal mengubah reservasi' });
+            }
+            setIsSubmitting(false);
+          }}
+        />
       )}
     </div>
   );

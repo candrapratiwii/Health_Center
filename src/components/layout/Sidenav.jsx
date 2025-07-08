@@ -36,7 +36,7 @@ function Sidenav({ color }) {
   const { userProfile } = useContext(AuthContext);
   if (!userProfile || !userProfile.tipe_user) return null;
 
-  if (userProfile.tipe_user === "admin") return <AdminSidenav color={color} />;
+  if (userProfile.tipe_user === "admin" || userProfile.tipe_user === "admin") return <AdminSidenav color={color} />;
   if (userProfile.tipe_user === "staff") return <StaffSidenav color={color} />;
   if (userProfile.tipe_user === "patien" || userProfile.tipe_user === "pasien") return <PasienSidenav color={color} />;
 

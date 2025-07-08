@@ -1,6 +1,5 @@
-import { useState } from "react";
-import { Menu } from "antd";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
+import React, { useContext } from "react";
 import {
   HomeOutlined,
   CalendarOutlined,
@@ -8,131 +7,86 @@ import {
   TeamOutlined,
   UserAddOutlined,
   BarChartOutlined,
-  SettingOutlined,
+  LogoutOutlined,
 } from "@ant-design/icons";
+import { AuthContext } from "../../../providers/AuthProvider";
 
 function AdminSidenav({ color }) {
-  const [selectedKey, setSelectedKey] = useState("/admin/dashboard");
+  const { logout } = useContext(AuthContext);
 
-  const menuItems = [
+  const menu = [
     {
       key: "/admin/dashboard",
-      label: (
-        <NavLink to="/admin/dashboard">
-          <span
-            className="icon"
-            style={{ backgroundColor: selectedKey === "/admin/dashboard" ? "#f0f6ff" : "" }}
-          >
-            <HomeOutlined style={{ color: selectedKey === "/admin/dashboard" ? "#1677ff" : color }} />
-          </span>
-          <span className="label">Dashboard</span>
-        </NavLink>
-      ),
+      label: "Dashboard",
+      icon: <HomeOutlined className="sidebar-nav-icon" />,
     },
     {
       key: "/admin/reservasi",
-      label: (
-        <NavLink to="/admin/reservasi">
-          <span
-            className="icon"
-            style={{ backgroundColor: selectedKey === "/admin/reservasi" ? "#f0f6ff" : "" }}
-          >
-            <CalendarOutlined style={{ color: selectedKey === "/admin/reservasi" ? "#1677ff" : color }} />
-          </span>
-          <span className="label">Kelola Reservasi</span>
-        </NavLink>
-      ),
+      label: "Kelola Reservasi",
+      icon: <CalendarOutlined className="sidebar-nav-icon" />,
     },
     {
       key: "/admin/layanan",
-      label: (
-        <NavLink to="/admin/layanan">
-          <span
-            className="icon"
-            style={{ backgroundColor: selectedKey === "/admin/layanan" ? "#f0f6ff" : "" }}
-          >
-            <MedicineBoxOutlined style={{ color: selectedKey === "/admin/layanan" ? "#1677ff" : color }} />
-          </span>
-          <span className="label">Data Layanan</span>
-        </NavLink>
-      ),
+      label: "Data Layanan",
+      icon: <MedicineBoxOutlined className="sidebar-nav-icon" />,
     },
     {
       key: "/admin/dokter",
-      label: (
-        <NavLink to="/admin/dokter">
-          <span
-            className="icon"
-            style={{ backgroundColor: selectedKey === "/admin/dokter" ? "#f0f6ff" : "" }}
-          >
-            <TeamOutlined style={{ color: selectedKey === "/admin/dokter" ? "#1677ff" : color }} />
-          </span>
-          <span className="label">Data Dokter</span>
-        </NavLink>
-      ),
+      label: "Data Dokter",
+      icon: <TeamOutlined className="sidebar-nav-icon" />,
     },
     {
       key: "/admin/pasien",
-      label: (
-        <NavLink to="/admin/pasien">
-          <span
-            className="icon"
-            style={{ backgroundColor: selectedKey === "/admin/pasien" ? "#f0f6ff" : "" }}
-          >
-            <UserAddOutlined style={{ color: selectedKey === "/admin/pasien" ? "#1677ff" : color }} />
-          </span>
-          <span className="label">Data Pasien</span>
-        </NavLink>
-      ),
+      label: "Data Pasien",
+      icon: <UserAddOutlined className="sidebar-nav-icon" />,
+    },
+    {
+      key: "/admin/staf",
+      label: "Data Staf",
+      icon: <TeamOutlined className="sidebar-nav-icon" />,
     },
     {
       key: "/admin/laporan",
-      label: (
-        <NavLink to="/admin/laporan">
-          <span
-            className="icon"
-            style={{ backgroundColor: selectedKey === "/admin/laporan" ? "#f0f6ff" : "" }}
-          >
-            <BarChartOutlined style={{ color: selectedKey === "/admin/laporan" ? "#1677ff" : color }} />
-          </span>
-          <span className="label">Laporan</span>
-        </NavLink>
-      ),
-    },
-    {
-      key: "/admin/pengaturan",
-      label: (
-        <NavLink to="/admin/pengaturan">
-          <span
-            className="icon"
-            style={{ backgroundColor: selectedKey === "/admin/pengaturan" ? "#f0f6ff" : "" }}
-          >
-            <SettingOutlined style={{ color: selectedKey === "/admin/pengaturan" ? "#1677ff" : color }} />
-          </span>
-          <span className="label">Pengaturan</span>
-        </NavLink>
-      ),
+      label: "Laporan",
+      icon: <BarChartOutlined className="sidebar-nav-icon" />,
     },
   ];
 
-  const handleMenuKey = ({ key }) => {
-    setSelectedKey(key);
-  };
-
   return (
-    <>
-      <div className="brand">
-        <span>Admin Puskesmas</span>
+    <div className="sidebar-patient">
+      <div>
+        <div className="sidebar-header" style={{ cursor: 'pointer' }} onClick={() => useNavigate()('/admin/dashboard')}>
+          <div className="sidebar-logo">A</div>
+          <div>
+            <div className="sidebar-title">Admin Puskesmas</div>
+            <div className="sidebar-desc">Manajemen Sistem</div>
+          </div>
+        </div>
+        <nav className="sidebar-nav">
+          {menu.map((item) => (
+            <NavLink
+              to={item.key}
+              key={item.key}
+              className={({ isActive }) =>
+                'sidebar-nav-item' + (isActive ? ' active' : '')
+              }
+            >
+              {item.icon}
+              {item.label}
+            </NavLink>
+          ))}
+        </nav>
       </div>
-      <hr />
-      <Menu
-        theme="light"
-        mode="inline"
-        items={menuItems}
-        selectedKeys={[selectedKey]}
-        onSelect={handleMenuKey}
-      />
-    </>
+      <div className="sidebar-footer">
+        <button
+          className="sidebar-nav-item"
+          style={{ color: '#d32f2f', width: '100%', background: 'none', border: 'none', display: 'flex', alignItems: 'center', gap: 12, fontWeight: 600, fontSize: 16, cursor: 'pointer' }}
+          onClick={logout}
+        >
+          <LogoutOutlined className="sidebar-nav-icon" /> Logout
+        </button>
+      </div>
+    </div>
   );
 }
 

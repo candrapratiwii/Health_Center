@@ -1,4 +1,4 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 
 import "antd/dist/reset.css";
 import "./assets/styles/main.css";
@@ -14,6 +14,14 @@ import DashboardPatient from './pages/Patient/Dashboard/DashboardPatient';
 import BookingPatient from './pages/Patient/Booking/BookingPatient';
 import AppointmentsPatient from './pages/Patient/Appointments/AppointmentsPatient';
 import ProfilePatient from './pages/Patient/Profile/ProfilePatient';
+import AdminDashboard from './pages/Admin/AdminDashboard';
+import DashboardAdmin from './pages/Admin/DashboardAdmin';
+import ReservationAdmin from './pages/Admin/ReservationAdmin';
+import KelolaLayanan from './pages/Admin/KelolaLayanan';
+import DataDokter from './pages/Admin/DataDokter';
+import DataPasien from './pages/Admin/DataPasien';
+import KelolaStaf from './pages/Admin/KelolaStaf';
+import Laporan from './pages/Admin/Laporan';
 
 // Temporary placeholder component for routes that don't have components yet
 const PlaceholderComponent = () => (
@@ -30,42 +38,17 @@ function App() {
       <Route exact path="/login" element={<LoginPage />} />
       <Route exact path="/register" element={<RegisterPage />} />
 
-      {/* Admin Routes */}
-      <Route
-        exact
-        path="/admin/dashboard"
-        element={<PrivateRoute component={<PlaceholderComponent />} />}
-      />
-      <Route
-        exact
-        path="/admin/reservasi"
-        element={<PrivateRoute component={<PlaceholderComponent />} />}
-      />
-      <Route
-        exact
-        path="/admin/layanan"
-        element={<PrivateRoute component={<PlaceholderComponent />} />}
-      />
-      <Route
-        exact
-        path="/admin/dokter"
-        element={<PrivateRoute component={<PlaceholderComponent />} />}
-      />
-      <Route
-        exact
-        path="/admin/pasien"
-        element={<PrivateRoute component={<PlaceholderComponent />} />}
-      />
-      <Route
-        exact
-        path="/admin/laporan"
-        element={<PrivateRoute component={<PlaceholderComponent />} />}
-      />
-      <Route
-        exact
-        path="/admin/pengaturan"
-        element={<PrivateRoute component={<PlaceholderComponent />} />}
-      />
+      {/* Admin Nested Routes */}
+      <Route path="/admin/*" element={<AdminDashboard />}>
+        <Route path="dashboard" element={<DashboardAdmin />} />
+        <Route path="reservasi" element={<ReservationAdmin />} />
+        <Route path="layanan" element={<KelolaLayanan />} />
+        <Route path="dokter" element={<DataDokter />} />
+        <Route path="pasien" element={<DataPasien />} />
+        <Route path="staf" element={<KelolaStaf />} />
+        <Route path="laporan" element={<Laporan />} />
+        <Route index element={<Navigate to="dashboard" replace />} />
+      </Route>
 
       {/* Staff Routes */}
       <Route
@@ -99,47 +82,7 @@ function App() {
         element={<PrivateRoute component={<PlaceholderComponent />} />}
       />
 
-      {/* Legacy Routes - Redirect to dashboard */}
-      <Route
-        exact
-        path="/books"
-        element={<PrivateRoute component={<PlaceholderComponent />} />}
-      />
-      <Route
-        exact
-        path="/films"
-        element={<PrivateRoute component={<PlaceholderComponent />} />}
-      />
-      <Route
-        exact
-        path="/orders"
-        element={<PrivateRoute component={<PlaceholderComponent />} />}
-      />
-      <Route
-        exact
-        path="/categories"
-        element={<PrivateRoute component={<PlaceholderComponent />} />}
-      />
-      <Route
-        exact
-        path="/products"
-        element={<PrivateRoute component={<PlaceholderComponent />} />}
-      />
-      <Route
-        exact
-        path="/report-orders"
-        element={<PrivateRoute component={<PlaceholderComponent />} />}
-      />
-      <Route
-        exact
-        path="/summary"
-        element={<PrivateRoute component={<PlaceholderComponent />} />}
-      />
-      <Route
-        exact
-        path="/product-sales-report"
-        element={<PrivateRoute component={<PlaceholderComponent />} />}
-      />
+     
       <Route
         exact
         path="/profile"

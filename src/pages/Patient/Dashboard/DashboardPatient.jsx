@@ -29,51 +29,51 @@ const DashboardPatient = () => {
   const username = userProfile?.nama || userProfile?.username || 'Pengguna';
   return (
     <>
-      <div className="dashboard-patient">
-        <div className="quick-actions">
-          <button className="action-btn"><Calendar />Buat Janji</button>
-          <button className="action-btn"><Clock />Janji Temu</button>
-          <button className="action-btn"><FileText />Layanan</button>
-          <button className="action-btn"><Heart />Kesehatan</button>
-        </div>
-        <div className="upcoming-appointments">
-          <h3>Janji Temu Mendatang</h3>
-          {appointments.filter(apt => apt.status === 'confirmed').map(appointment => (
-            <div key={appointment.id_reservasi} className="appointment-card">
-              <div>
-                <h4>{appointment.service}</h4>
-                <p>{appointment.puskesmas}</p>
-                <p>{new Date(appointment.tanggal_reservasi).toLocaleDateString('id-ID')} - {appointment.waktu_antrian}</p>
+  <div className="dashboard-patient">
+    <div className="quick-actions">
+      <button className="action-btn"><Calendar />Buat Janji</button>
+      <button className="action-btn"><Clock />Janji Temu</button>
+      <button className="action-btn"><FileText />Layanan</button>
+      <button className="action-btn"><Heart />Kesehatan</button>
+    </div>
+    <div className="upcoming-appointments">
+      <h3>Janji Temu Mendatang</h3>
+      {appointments.filter(apt => apt.status === 'confirmed').map(appointment => (
+        <div key={appointment.id_reservasi} className="appointment-card">
+          <div>
+            <h4>{appointment.service}</h4>
+            <p>{appointment.puskesmas}</p>
+            <p>{new Date(appointment.tanggal_reservasi).toLocaleDateString('id-ID')} - {appointment.waktu_antrian}</p>
               </div>
               <div style={{display: 'flex', flexDirection: 'column', alignItems: 'flex-end'}}>
                 <span className="status-confirmed" style={{display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center'}}>
                   Terkonfirmasi
                   <span className="queue-number-highlight" style={{margin: '0.3rem 0 0 0'}}>{formatQueueNumber(appointment.nomor_antrian)}</span>
                 </span>
-              </div>
-            </div>
-          ))}
-        </div>
-        <div className="health-stats">
-          <div className="stat-card">
-            <span>Kunjungan Bulan Ini</span>
-            <span>2</span>
-            <Activity />
-          </div>
-          <div className="stat-card">
-            <span>Reservasi Aktif</span>
-            <span>1</span>
-            <Calendar />
-          </div>
-          <div className="stat-card">
-            <span>Puskesmas Tersedia</span>
-            <span>2</span>
-            <MapPin />
           </div>
         </div>
+      ))}
+    </div>
+    <div className="health-stats">
+      <div className="stat-card">
+        <span>Kunjungan Bulan Ini</span>
+        <span>2</span>
+        <Activity />
       </div>
+      <div className="stat-card">
+        <span>Reservasi Aktif</span>
+        <span>1</span>
+        <Calendar />
+      </div>
+      <div className="stat-card">
+        <span>Puskesmas Tersedia</span>
+        <span>2</span>
+        <MapPin />
+      </div>
+    </div>
+  </div>
     </>
-  );
+);
 };
 
 export default DashboardPatient; 
