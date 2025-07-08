@@ -91,24 +91,43 @@ const AppointmentsPatient = () => {
     setIsSubmitting(false);
   };
 
-  // Debug initialData untuk reschedule
+  // Prefill data untuk reschedule
   const debugInitialData = rescheduleModal.appointment && puskesmasList.length && servicesList.length ? {
-    selectedPuskesmas: puskesmasList.find(
-      p => String(p.id_puskesmas) === String(rescheduleModal.appointment.id_puskesmas)
-    ),
-    selectedLayanan: servicesList.find(
-      s => String(s.id_layanan) === String(rescheduleModal.appointment.id_layanan)
-    ) ? String(rescheduleModal.appointment.id_layanan) : (servicesList[0] ? String(servicesList[0].id_layanan) : ''),
+    selectedPuskesmas:
+      puskesmasList.find(
+        p => String(p.id_puskesmas) === String(rescheduleModal.appointment.id_puskesmas)
+      )
+      || puskesmasList.find(
+        p => (p.nama_puskesmas || '').trim().toLowerCase() === (rescheduleModal.appointment.nama_puskesmas || '').trim().toLowerCase()
+      )
+      || null,
+    selectedLayanan:
+      rescheduleModal.appointment.id_layanan
+        ? String(rescheduleModal.appointment.id_layanan)
+        : (
+          servicesList.find(
+            s => (s.nama_layanan || '').trim().toLowerCase() === (rescheduleModal.appointment.nama_layanan || '').trim().toLowerCase()
+          )?.id_layanan
+            ? String(servicesList.find(
+                s => (s.nama_layanan || '').trim().toLowerCase() === (rescheduleModal.appointment.nama_layanan || '').trim().toLowerCase()
+              ).id_layanan)
+            : ''
+        ),
     selectedTanggal: rescheduleModal.appointment.tanggal_reservasi
       ? new Date(rescheduleModal.appointment.tanggal_reservasi).toISOString().slice(0, 10)
       : '',
     selectedJam: rescheduleModal.appointment.waktu_antrian || ''
   } : {};
-  console.log('initialData for reschedule:', debugInitialData);
+  if (rescheduleModal.open) {
+    console.log('DEBUG initialData for reschedule:', debugInitialData, rescheduleModal.appointment);
+    if (!debugInitialData.selectedPuskesmas) {
+      console.warn('Puskesmas untuk prefill tidak ditemukan di list!');
+    }
+  }
 
   return (
-    <div className="appointments-patient">
-      <h3>Reservasi Saya</h3>
+  <div className="appointments-patient">
+    <h3>Reservasi Saya</h3>
       <div style={{ marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
         <label htmlFor="statusFilter">Filter Status:</label>
         <select
@@ -124,7 +143,7 @@ const AppointmentsPatient = () => {
         </select>
       </div>
       {loading ? <div>Loading data reservasi...</div> : null}
-      <div className="appointments-list">
+    <div className="appointments-list">
         {filteredAppointments.map(appointment => {
           const isCancelled = appointment.status === 'cancelled';
           return (
@@ -150,7 +169,7 @@ const AppointmentsPatient = () => {
                   <span>Tanggal: {appointment.tanggal_reservasi ? new Date(appointment.tanggal_reservasi).toLocaleDateString('id-ID') : '-'}</span><br />
                   <span>Waktu: {appointment.waktu_antrian || '-'}</span><br />
                   <span>No. Antrian: {appointment.nomor_antrian || '-'}</span>
-                </div>
+          </div>
                 <div style={{marginTop: '0.5rem', display: 'flex', gap: '0.5rem'}}>
                   <button
                     onClick={() => handleReschedule(appointment)}
@@ -187,8 +206,8 @@ const AppointmentsPatient = () => {
                       Cancel
                     </button>
                   </Popconfirm>
-                </div>
-              </div>
+          </div>
+        </div>
               <div className="appointment-meta" style={{display: 'flex', flexDirection: 'column', alignItems: 'flex-end', textAlign: 'right', minWidth: '120px'}}>
                 <span className={`status ${appointment.status}`} style={{
                   background: appointment.status === 'confirmed' ? '#e0ffe0' : appointment.status === 'cancelled' ? '#eee' : '#fffbe0',
@@ -201,9 +220,9 @@ const AppointmentsPatient = () => {
                   {appointment.status === 'confirmed' ? 'Terkonfirmasi' : appointment.status === 'cancelled' ? 'Dibatalkan' : 'Menunggu'}
                 </span>
                 <span className={`queue-number ${appointment.status}`} style={{marginTop: '0.4rem'}}>{formatQueueNumber(appointment.nomor_antrian)}</span>
-              </div>
-            </div>
-          );
+    </div>
+  </div>
+);
         })}
       </div>
       {contextHolder}
@@ -216,15 +235,9 @@ const AppointmentsPatient = () => {
             return;
           }
           setIsSubmitting(true);
-          // Log payload PUT
-          console.log('Reschedule PUT payload:', {
-            id_puskesmas: selectedPuskesmas.kode_faskes,
-            id_layanan: parseInt(selectedLayanan, 10),
-            tanggal_reservasi: `${selectedTanggal}T${selectedJam}:00`
-          });
           try {
             await editDataPrivatePut(`/api/v1/reservations/${rescheduleModal.appointment.id_reservasi}`, {
-              id_puskesmas: selectedPuskesmas.kode_faskes,
+              id_puskesmas: selectedPuskesmas?.kode_faskes || selectedPuskesmas?.id_puskesmas,
               id_layanan: parseInt(selectedLayanan, 10),
               tanggal_reservasi: `${selectedTanggal}T${selectedJam}:00`
             });

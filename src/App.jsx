@@ -22,6 +22,10 @@ import DataDokter from './pages/Admin/DataDokter';
 import DataPasien from './pages/Admin/DataPasien';
 import KelolaStaf from './pages/Admin/KelolaStaf';
 import Laporan from './pages/Admin/Laporan';
+import StaffReservations from "./pages/Staff/StaffReservations";
+import StaffLayout from "./components/layout/StaffLayout";
+import StaffDashboard from "./pages/Staff/StaffDashboard";
+import RiwayatReservasiStaff from "./pages/Staff/RiwayatReservasiStaff";
 
 // Temporary placeholder component for routes that don't have components yet
 const PlaceholderComponent = () => (
@@ -51,36 +55,11 @@ function App() {
       </Route>
 
       {/* Staff Routes */}
-      <Route
-        exact
-        path="/staff/dashboard"
-        element={<PrivateRoute component={<PlaceholderComponent />} />}
-      />
-      <Route
-        exact
-        path="/staff/reservasi"
-        element={<PrivateRoute component={<PlaceholderComponent />} />}
-      />
-      <Route
-        exact
-        path="/staff/layanan"
-        element={<PrivateRoute component={<PlaceholderComponent />} />}
-      />
-      <Route
-        exact
-        path="/staff/dokter"
-        element={<PrivateRoute component={<PlaceholderComponent />} />}
-      />
-      <Route
-        exact
-        path="/staff/pasien"
-        element={<PrivateRoute component={<PlaceholderComponent />} />}
-      />
-      <Route
-        exact
-        path="/staff/laporan"
-        element={<PrivateRoute component={<PlaceholderComponent />} />}
-      />
+      <Route path="/staff" element={<StaffLayout />}>
+        <Route path="dashboard" element={<StaffDashboard />} />
+        <Route path="reservations" element={<StaffReservations />} />
+        <Route path="history" element={<RiwayatReservasiStaff />} />
+      </Route>
 
      
       <Route

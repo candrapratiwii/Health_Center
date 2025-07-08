@@ -59,14 +59,14 @@ const DashboardAdmin = () => {
           <div className="header-left">
             <h1 style={{ color: '#333', fontSize: 32, fontWeight: 700, marginBottom: 5 }}>Dashboard Admin</h1>
             <div className="header-subtitle" style={{ color: '#666', fontSize: 16 }}>Selamat datang di Sistem Informasi Puskesmas</div>
-          </div>
+      </div>
           <div className="header-right">
             <div className="date-time" style={{ textAlign: 'right', color: '#666' }}>
               <div className="current-date" style={{ fontSize: 18, fontWeight: 600, color: '#2dd4bf' }}>{date}</div>
               <div className="current-time" style={{ fontSize: 14, marginTop: 5 }}>{time}</div>
-            </div>
-          </div>
-        </div>
+      </div>
+      </div>
+    </div>
         <div className="stats-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: 25, marginBottom: 40 }}>
           {stats.map((s, i) => (
             <div key={i} className="stat-card" style={{ background: 'white', padding: 30, borderRadius: 20, boxShadow: '0 8px 25px rgba(0,0,0,0.1)', textAlign: 'center', position: 'relative', overflow: 'hidden' }}>
@@ -110,12 +110,12 @@ const DashboardAdmin = () => {
                   <div className="person-info" style={{ flex: 1 }}>
                     <div className="person-name" style={{ fontSize: 16, color: '#333', fontWeight: 600, marginBottom: 5 }}>{p.name}</div>
                     <div className="person-detail" style={{ fontSize: 14, color: '#666' }}>{p.detail}</div>
-                  </div>
+      </div>
                   <div className={`status-badge ${p.statusClass}`} style={{ padding: '6px 12px', borderRadius: 20, fontSize: 12, fontWeight: 600, textTransform: 'uppercase', background: p.statusClass === 'status-online' ? 'rgba(34, 197, 94, 0.1)' : p.statusClass === 'status-busy' ? 'rgba(239, 68, 68, 0.1)' : 'rgba(107, 114, 128, 0.1)', color: p.statusClass === 'status-online' ? '#22c55e' : p.statusClass === 'status-busy' ? '#ef4444' : '#6b7280' }}>{p.status}</div>
                 </li>
-              ))}
-            </ul>
-          </div>
+          ))}
+        </ul>
+      </div>
           <div className="content-section" style={{ background: 'white', padding: 30, borderRadius: 20, boxShadow: '0 8px 25px rgba(0,0,0,0.1)' }}>
             <h2 className="section-title" style={{ fontSize: 24, fontWeight: 700, color: '#333', marginBottom: 25, display: 'flex', alignItems: 'center', gap: 10 }}>👨‍⚕ Status Dokter</h2>
             <ul className="person-list" style={{ listStyle: 'none', maxHeight: 400, overflowY: 'auto', padding: 0 }}>
@@ -128,9 +128,9 @@ const DashboardAdmin = () => {
                   </div>
                   <div className={`status-badge ${d.statusClass}`} style={{ padding: '6px 12px', borderRadius: 20, fontSize: 12, fontWeight: 600, textTransform: 'uppercase', background: d.statusClass === 'status-online' ? 'rgba(34, 197, 94, 0.1)' : d.statusClass === 'status-busy' ? 'rgba(239, 68, 68, 0.1)' : 'rgba(107, 114, 128, 0.1)', color: d.statusClass === 'status-online' ? '#22c55e' : d.statusClass === 'status-busy' ? '#ef4444' : '#6b7280' }}>{d.status}</div>
                 </li>
-              ))}
-            </ul>
-          </div>
+          ))}
+        </ul>
+      </div>
         </div>
         <div className="activity-section" style={{ background: 'white', padding: 30, borderRadius: 20, boxShadow: '0 8px 25px rgba(0,0,0,0.1)', marginBottom: 40 }}>
           <h2 className="section-title" style={{ fontSize: 24, fontWeight: 700, color: '#333', marginBottom: 25, display: 'flex', alignItems: 'center', gap: 10 }}>📋 Aktivitas Terkini</h2>
@@ -144,15 +144,15 @@ const DashboardAdmin = () => {
                 </div>
                 <div className="activity-time" style={{ fontSize: 12, color: '#999', marginLeft: 'auto' }}>{a.time}</div>
               </li>
-            ))}
-          </ul>
-        </div>
+          ))}
+        </ul>
+      </div>
         <div className="footer" style={{ background: 'white', padding: 20, textAlign: 'center', color: '#666', fontSize: 14, boxShadow: '0 -2px 10px rgba(0,0,0,0.1)', borderRadius: '20px 20px 0 0', marginTop: 40 }}>
           Copyright © 2025 HealthCenter - Powered by Semangat Hidup Team
         </div>
-      </div>
     </div>
-  );
+  </div>
+);
 };
 
 export default DashboardAdmin;

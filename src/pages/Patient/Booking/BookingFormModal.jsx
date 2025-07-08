@@ -77,14 +77,14 @@ const BookingFormModal = ({ visible, onClose, onSubmit, initialData = {}, puskes
         <Form form={form} layout="vertical" onFinish={handleFinish}>
           <div className="modal-body">
             <Form.Item label="Puskesmas" name="puskesmas">
-              <Select disabled>
+              <Select disabled={mode === 'edit'}>
                 {puskesmasList.map(p => (
                   <Select.Option key={p.id_puskesmas} value={p.id_puskesmas}>{p.nama_puskesmas}</Select.Option>
                 ))}
               </Select>
             </Form.Item>
             <Form.Item label="Jenis Layanan" name="layanan" rules={[{ required: true, message: 'Pilih layanan' }]}> 
-              <Select placeholder="Pilih layanan">
+              <Select placeholder="Pilih layanan" disabled={mode === 'edit'}>
                 {servicesList.map(service => (
                   <Select.Option key={service.id_layanan} value={String(service.id_layanan)}>{service.nama_layanan}</Select.Option>
                 ))}

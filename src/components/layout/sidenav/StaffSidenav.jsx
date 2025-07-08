@@ -1,179 +1,82 @@
-import { useState } from "react";
-import { Menu } from "antd";
+import React from "react";
 import { NavLink } from "react-router-dom";
-import {
-  HomeOutlined,
-  CalendarOutlined,
-  MedicineBoxOutlined,
-  TeamOutlined,
-  UserAddOutlined,
-  BarChartOutlined,
-  SettingOutlined,
-} from "@ant-design/icons";
+import { HomeOutlined, FileTextOutlined, HistoryOutlined } from "@ant-design/icons";
+import { useContext } from "react";
+import { AuthContext } from "../../../providers/AuthProvider";
+import { useNavigate } from "react-router-dom";
+import { Button } from "antd";
 
-function StaffSidenav({ color }) {
-  const [selectedKey, setSelectedKey] = useState("/staff/dashboard");
+const mainColor = "#14b8a6";
+const accentColor = "#06b6d4";
 
-  const menuItems = [
-    {
-      key: "/staff/dashboard",
-      label: (
-        <NavLink to="/staff/dashboard">
-          <span
-            className="icon"
-            style={{
-              backgroundColor:
-                selectedKey === "/staff/dashboard" ? "#f0f6ff" : "",
-            }}
-          >
-            <HomeOutlined
-              style={{
-                color: selectedKey === "/staff/dashboard" ? "#1677ff" : color,
-              }}
-            />
-          </span>
-          <span className="label">Dashboard</span>
-        </NavLink>
-      ),
-    },
-    {
-      key: "/staff/reservasi",
-      label: (
-        <NavLink to="/staff/reservasi">
-          <span
-            className="icon"
-            style={{
-              backgroundColor:
-                selectedKey === "/staff/reservasi" ? "#f0f6ff" : "",
-            }}
-          >
-            <CalendarOutlined
-              style={{
-                color: selectedKey === "/staff/reservasi" ? "#1677ff" : color,
-              }}
-            />
-          </span>
-          <span className="label">Kelola Reservasi</span>
-        </NavLink>
-      ),
-    },
-    {
-      key: "/staff/layanan",
-      label: (
-        <NavLink to="/staff/layanan">
-          <span
-            className="icon"
-            style={{
-              backgroundColor:
-                selectedKey === "/staff/layanan" ? "#f0f6ff" : "",
-            }}
-          >
-            <MedicineBoxOutlined
-              style={{
-                color: selectedKey === "/staff/layanan" ? "#1677ff" : color,
-              }}
-            />
-          </span>
-          <span className="label">Data Layanan</span>
-        </NavLink>
-      ),
-    },
-    {
-      key: "/staff/dokter",
-      label: (
-        <NavLink to="/staff/dokter">
-          <span
-            className="icon"
-            style={{
-              backgroundColor: selectedKey === "/staff/dokter" ? "#f0f6ff" : "",
-            }}
-          >
-            <TeamOutlined
-              style={{
-                color: selectedKey === "/staff/dokter" ? "#1677ff" : color,
-              }}
-            />
-          </span>
-          <span className="label">Data Dokter</span>
-        </NavLink>
-      ),
-    },
-    {
-      key: "/staff/pasien",
-      label: (
-        <NavLink to="/staff/pasien">
-          <span
-            className="icon"
-            style={{
-              backgroundColor: selectedKey === "/staff/pasien" ? "#f0f6ff" : "",
-            }}
-          >
-            <UserAddOutlined
-              style={{
-                color: selectedKey === "/staff/pasien" ? "#1677ff" : color,
-              }}
-            />
-          </span>
-          <span className="label">Data Pasien</span>
-        </NavLink>
-      ),
-    },
-    {
-      key: "/staff/laporan",
-      label: (
-        <NavLink to="/staff/laporan">
-          <span
-            className="icon"
-            style={{
-              backgroundColor:
-                selectedKey === "/staff/laporan" ? "#f0f6ff" : "",
-            }}
-          >
-            <BarChartOutlined
-              style={{
-                color: selectedKey === "/staff/laporan" ? "#1677ff" : color,
-              }}
-            />
-          </span>
-          <span className="label">Laporan</span>
-        </NavLink>
-      ),
-    },
-    // {
-    //   key: "/staff/pengaturan",
-    //   label: (
-    //     <NavLink to="/staff/pengaturan">
-    //       <span
-    //         className="icon"
-    //         style={{ backgroundColor: selectedKey === "/staff/pengaturan" ? "#f0f6ff" : "" }}
-    //       >
-    //         <SettingOutlined style={{ color: selectedKey === "/staff/pengaturan" ? "#1677ff" : color }} />
-    //       </span>
-    //       <span className="label">Pengaturan</span>
-    //     </NavLink>
-    //   ),
-    // },
-  ];
+const menu = [
+  {
+    key: "dashboard",
+    label: "Dashboard",
+    icon: <HomeOutlined />,
+    to: "/staff/dashboard"
+  },
+  {
+    key: "reservations",
+    label: "Data Reservasi",
+    icon: <FileTextOutlined />,
+    to: "/staff/reservations"
+  }
+];
 
-  const handleMenuKey = ({ key }) => {
-    setSelectedKey(key);
+const StaffSidenav = () => {
+  const { logout } = useContext(AuthContext);
+  const navigate = useNavigate();
+  const handleLogout = () => {
+    logout();
   };
-
   return (
-    <>
-      <div className="brand">
-        <span>Staff Puskesmas</span>
+    <div style={{
+      width: 220,
+      minHeight: '100vh',
+      background: '#fff',
+      borderRight: `2px solid ${mainColor}10`,
+      boxShadow: '2px 0 16px #0001',
+      display: 'flex',
+      flexDirection: 'column',
+      position: 'relative',
+    }}>
+      <div style={{ padding: '32px 0 0 0', textAlign: 'center' }}>
+        <img src="/src/assets/images/logo.png" alt="Logo" style={{ width: 54, marginBottom: 10 }} />
+        <div style={{ fontWeight: 800, fontSize: 22, color: mainColor, letterSpacing: 0.5, marginBottom: 24 }}>Staff Center</div>
       </div>
-      <hr />
-      <Menu
-        theme="light"
-        mode="inline"
-        items={menuItems}
-        selectedKeys={[selectedKey]}
-        onSelect={handleMenuKey}
-      />
-    </>
+      <nav style={{ marginTop: 16 }}>
+        <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+          <li style={{ marginBottom: 8 }}>
+            <NavLink to="/staff/dashboard" className={({ isActive }) => isActive ? 'active' : ''} style={({ isActive }) => ({
+              display: 'flex', alignItems: 'center', gap: 12, fontWeight: 600, fontSize: 17, color: isActive ? mainColor : '#444', background: isActive ? '#e0fdfa' : 'transparent', borderRadius: 10, padding: '12px 24px', textDecoration: 'none', transition: 'all 0.2s', boxShadow: isActive ? `0 2px 8px ${mainColor}22` : 'none'
+            })}>
+              <HomeOutlined style={{ fontSize: 20, color: accentColor }} /> Dashboard
+            </NavLink>
+          </li>
+          <li style={{ marginBottom: 8 }}>
+            <NavLink to="/staff/reservations" className={({ isActive }) => isActive ? 'active' : ''} style={({ isActive }) => ({
+              display: 'flex', alignItems: 'center', gap: 12, fontWeight: 600, fontSize: 17, color: isActive ? mainColor : '#444', background: isActive ? '#e0fdfa' : 'transparent', borderRadius: 10, padding: '12px 24px', textDecoration: 'none', transition: 'all 0.2s', boxShadow: isActive ? `0 2px 8px ${mainColor}22` : 'none'
+            })}>
+              <FileTextOutlined style={{ fontSize: 20, color: accentColor }} /> Data Reservasi
+            </NavLink>
+          </li>
+          <li style={{ marginBottom: 8 }}>
+            <NavLink to="/staff/history" className={({ isActive }) => isActive ? 'active' : ''} style={({ isActive }) => ({
+              display: 'flex', alignItems: 'center', gap: 12, fontWeight: 600, fontSize: 17, color: isActive ? mainColor : '#444', background: isActive ? '#e0fdfa' : 'transparent', borderRadius: 10, padding: '12px 24px', textDecoration: 'none', transition: 'all 0.2s', boxShadow: isActive ? `0 2px 8px ${mainColor}22` : 'none'
+            })}>
+              <HistoryOutlined style={{ fontSize: 20, color: accentColor }} /> Riwayat Reservasi
+            </NavLink>
+          </li>
+        </ul>
+      </nav>
+      <div style={{ position: 'absolute', bottom: 80, left: 0, width: '100%', textAlign: 'center' }}>
+        <Button danger type="primary" onClick={handleLogout} style={{ width: '80%', fontWeight: 700, fontSize: 16, borderRadius: 8, boxShadow: '0 2px 8px #0001' }}>
+          Logout
+        </Button>
+      </div>
+    </div>
   );
-}
+};
 
 export default StaffSidenav;
