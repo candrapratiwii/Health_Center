@@ -36,9 +36,9 @@ function AdminSidenav({ color }) {
       icon: <TeamOutlined className="sidebar-nav-icon" />,
     },
     {
-      key: "/admin/pasien",
-      label: "Data Pasien",
-      icon: <UserAddOutlined className="sidebar-nav-icon" />,
+      key: "/admin/puskesmas",
+      label: "Data Puskesmas",
+      icon: <HomeOutlined className="sidebar-nav-icon" />,
     },
     {
       key: "/admin/staf",
@@ -55,7 +55,11 @@ function AdminSidenav({ color }) {
   return (
     <div className="sidebar-patient">
       <div>
-        <div className="sidebar-header" style={{ cursor: 'pointer' }} onClick={() => useNavigate()('/admin/dashboard')}>
+        <div
+          className="sidebar-header"
+          style={{ cursor: "pointer" }}
+          onClick={() => useNavigate()("/admin/dashboard")}
+        >
           <div className="sidebar-logo">A</div>
           <div>
             <div className="sidebar-title">Admin Puskesmas</div>
@@ -68,7 +72,7 @@ function AdminSidenav({ color }) {
               to={item.key}
               key={item.key}
               className={({ isActive }) =>
-                'sidebar-nav-item' + (isActive ? ' active' : '')
+                "sidebar-nav-item" + (isActive ? " active" : "")
               }
             >
               {item.icon}
@@ -80,7 +84,18 @@ function AdminSidenav({ color }) {
       <div className="sidebar-footer">
         <button
           className="sidebar-nav-item"
-          style={{ color: '#d32f2f', width: '100%', background: 'none', border: 'none', display: 'flex', alignItems: 'center', gap: 12, fontWeight: 600, fontSize: 16, cursor: 'pointer' }}
+          style={{
+            color: "#d32f2f",
+            width: "100%",
+            background: "none",
+            border: "none",
+            display: "flex",
+            alignItems: "center",
+            gap: 12,
+            fontWeight: 600,
+            fontSize: 16,
+            cursor: "pointer",
+          }}
           onClick={logout}
         >
           <LogoutOutlined className="sidebar-nav-icon" /> Logout

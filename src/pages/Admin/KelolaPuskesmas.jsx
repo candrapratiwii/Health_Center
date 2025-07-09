@@ -11,6 +11,7 @@ import {
   message,
   Popconfirm,
   notification,
+  Select,
 } from "antd";
 import {
   PlusOutlined,
@@ -23,29 +24,17 @@ import { getDataPrivate, sendData, deleteData } from "../../utils/api";
 
 const mainColor = "#14b8a6";
 
-const mockPuskesmas = [
-  {
-    id: 1,
-    nama_puskesmas: "Puskesmas Sukamaju",
-    alamat: "Jl. Melati No. 10, Sukamaju",
-    no_telp: "021-1234567",
-    status: "Aktif",
-  },
-  {
-    id: 2,
-    nama_puskesmas: "Puskesmas Harapan Baru",
-    alamat: "Jl. Mawar No. 5, Harapan Baru",
-    no_telp: "021-7654321",
-    status: "Aktif",
-  },
-  {
-    id: 3,
-    nama_puskesmas: "Puskesmas Cempaka",
-    alamat: "Jl. Cempaka No. 2, Cempaka",
-    no_telp: "021-8888888",
-    status: "Nonaktif",
-  },
-];
+// Ambil data dokter untuk mapping id_dokter ke nama dokter
+const useDoctors = () => {
+  const [doctors, setDoctors] = useState([]);
+  React.useEffect(() => {
+    getDataPrivate("/api/v1/doctors").then((resp) => {
+      let arr = Array.isArray(resp) ? resp : resp.data || [];
+      setDoctors(arr);
+    });
+  }, []);
+  return doctors;
+};
 
 const statusTag = {
   Aktif: <Tag color="green">Aktif</Tag>,
@@ -63,6 +52,7 @@ const KelolaPuskesmas = () => {
   const openNotificationWithIcon = (type, title, description) => {
     api[type]({ message: title, description: description });
   };
+  const doctors = useDoctors();
 
   React.useEffect(() => {
     getDataPuskesmas();
@@ -88,20 +78,25 @@ const KelolaPuskesmas = () => {
     (p) =>
       p.nama_puskesmas.toLowerCase().includes(search.toLowerCase()) ||
       p.alamat.toLowerCase().includes(search.toLowerCase()) ||
-      p.no_telp.toLowerCase().includes(search.toLowerCase())
+      (p.nomor_kontak || "").toLowerCase().includes(search.toLowerCase())
   );
 
   const columns = [
     {
+      title: "No",
+      key: "no",
+      render: (_, __, idx) => idx + 1,
+    },
+    {
+      title: "Kode Faskes",
+      dataIndex: "kode_faskes",
+      key: "kode_faskes",
+    },
+    {
       title: "Nama Puskesmas",
       dataIndex: "nama_puskesmas",
       key: "nama_puskesmas",
-      render: (text) => (
-        <span>
-          <HomeOutlined style={{ color: mainColor, marginRight: 6 }} />
-          {text}
-        </span>
-      ),
+      render: (text) => text,
     },
     {
       title: "Alamat",
@@ -109,15 +104,19 @@ const KelolaPuskesmas = () => {
       key: "alamat",
     },
     {
-      title: "No. Telp",
-      dataIndex: "no_telp",
-      key: "no_telp",
+      title: "Nomor Kontak",
+      dataIndex: "nomor_kontak",
+      key: "nomor_kontak",
     },
     {
-      title: "Status",
-      dataIndex: "status",
-      key: "status",
-      render: (status) => statusTag[status] || <Tag>{status}</Tag>,
+      title: "Nama Dokter",
+      key: "nama_dokter",
+      render: (_, record) => {
+        const dokter = doctors.find(
+          (d) => String(d.id_dokter) === String(record.id_dokter)
+        );
+        return dokter ? dokter.nama_dokter : "-";
+      },
     },
     {
       title: "Aksi",
@@ -166,9 +165,13 @@ const KelolaPuskesmas = () => {
   function handleEdit(puskesmas) {
     setEditingPuskesmas(puskesmas);
     form.setFieldsValue({
+      kode_faskes: puskesmas.kode_faskes,
       nama_puskesmas: puskesmas.nama_puskesmas,
       alamat: puskesmas.alamat,
-      jam_operasional: puskesmas.jam_operasional,
+      jam_operasional:
+        typeof puskesmas.jam_operasional === "string"
+          ? puskesmas.jam_operasional
+          : JSON.stringify(puskesmas.jam_operasional),
       nomor_kontak: puskesmas.nomor_kontak,
       id_dokter: puskesmas.id_dokter,
     });
@@ -207,13 +210,18 @@ const KelolaPuskesmas = () => {
 
   function handleModalOk() {
     form.validateFields().then((values) => {
+      let jam_operasional = values.jam_operasional;
+      try {
+        jam_operasional = JSON.parse(jam_operasional);
+      } catch {
+        message.error("Jam operasional harus format JSON valid!");
+        return;
+      }
       const payload = {
+        kode_faskes: values.kode_faskes,
         nama_puskesmas: values.nama_puskesmas,
         alamat: values.alamat,
-        jam_operasional:
-          values.jam_operasional && values.jam_operasional.length === 16
-            ? values.jam_operasional + ":00"
-            : values.jam_operasional,
+        jam_operasional,
         nomor_kontak: values.nomor_kontak,
         id_dokter: Number(values.id_dokter),
       };
@@ -370,6 +378,13 @@ const KelolaPuskesmas = () => {
       >
         <Form form={form} layout="vertical">
           <Form.Item
+            label="Kode Faskes"
+            name="kode_faskes"
+            rules={[{ required: true, message: "Kode faskes wajib diisi" }]}
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item
             label="Nama Puskesmas"
             name="nama_puskesmas"
             rules={[{ required: true, message: "Nama puskesmas wajib diisi" }]}
@@ -384,11 +399,30 @@ const KelolaPuskesmas = () => {
             <Input />
           </Form.Item>
           <Form.Item
-            label="Jam Operasional"
+            label="Jam Operasional (format JSON)"
             name="jam_operasional"
-            rules={[{ required: true, message: "Jam operasional wajib diisi" }]}
+            rules={[
+              {
+                required: true,
+                message: "Jam operasional wajib diisi (format JSON)",
+              },
+              {
+                validator: (_, value) => {
+                  if (!value) return Promise.resolve();
+                  try {
+                    JSON.parse(value);
+                    return Promise.resolve();
+                  } catch {
+                    return Promise.reject("Format harus JSON valid!");
+                  }
+                },
+              },
+            ]}
           >
-            <Input type="datetime-local" />
+            <Input.TextArea
+              rows={4}
+              placeholder='{"Senin": {"buka": "08:00", "tutup": "14:00"}, ...}'
+            />
           </Form.Item>
           <Form.Item
             label="Nomor Kontak"
@@ -398,11 +432,24 @@ const KelolaPuskesmas = () => {
             <Input />
           </Form.Item>
           <Form.Item
-            label="ID Dokter"
+            label="Nama Dokter"
             name="id_dokter"
-            rules={[{ required: true, message: "ID dokter wajib diisi" }]}
+            rules={[{ required: true, message: "Nama dokter wajib dipilih" }]}
           >
-            <Input type="number" />
+            <Select
+              showSearch
+              placeholder="Pilih dokter"
+              optionFilterProp="children"
+              filterOption={(input, option) =>
+                option.children.toLowerCase().includes(input.toLowerCase())
+              }
+            >
+              {doctors.map((d) => (
+                <Select.Option key={d.id_dokter} value={d.id_dokter}>
+                  {d.nama_dokter}
+                </Select.Option>
+              ))}
+            </Select>
           </Form.Item>
         </Form>
       </Modal>

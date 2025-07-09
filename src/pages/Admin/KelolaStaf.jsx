@@ -47,14 +47,27 @@ const KelolaStaf = () => {
     api[type]({ message: title, description: description });
   };
   const [puskesmasList, setPuskesmasList] = useState([]);
-  const [assignModal, setAssignModal] = useState({ open: false, staff: null, assigned: [] });
+  const [assignModal, setAssignModal] = useState({
+    open: false,
+    staff: null,
+    assigned: [],
+  });
 
   // Helper untuk refresh assignment semua staff
   async function refreshAllStaffAssignments(staffList) {
-    const updated = await Promise.all(staffList.map(async (s) => {
-      const assigned = await getDataPrivate(`/api/v1/health_center_staff/${s.id_user}`);
-      return { ...s, puskesmasAssigned: Array.isArray(assigned) ? assigned : assigned.data || [] };
-    }));
+    const updated = await Promise.all(
+      staffList.map(async (s) => {
+        const assigned = await getDataPrivate(
+          `/api/v1/health_center_staff/${s.id_user}`
+        );
+        return {
+          ...s,
+          puskesmasAssigned: Array.isArray(assigned)
+            ? assigned
+            : assigned.data || [],
+        };
+      })
+    );
     setStaff(updated);
   }
 
@@ -93,24 +106,26 @@ const KelolaStaf = () => {
     setShowModal(true);
   }
   function handleDelete(id_user) {
-    deleteData(`/api/v1/users/${id_user}`).then((resp) => {
-      // Setelah delete, refresh data staff
-      getDataPrivate("/api/v1/users/").then((data) => {
-        let arr = Array.isArray(data) ? data : data.data || [];
-        const staff = arr.filter((u) => u.tipe_user === "staff");
-        setStaff(staff);
-        message.success("Staf berhasil dihapus");
+    deleteData(`/api/v1/users/${id_user}`)
+      .then((resp) => {
+        // Setelah delete, refresh data staff
+        getDataPrivate("/api/v1/users/").then((data) => {
+          let arr = Array.isArray(data) ? data : data.data || [];
+          const staff = arr.filter((u) => u.tipe_user === "staff");
+          setStaff(staff);
+          message.success("Staf berhasil dihapus");
+        });
+      })
+      .catch(() => {
+        message.error("Gagal menghapus staf");
       });
-    }).catch(() => {
-      message.error("Gagal menghapus staf");
-    });
   }
   function handleModalOk() {
     form.validateFields().then((values) => {
       const payload = {
         username: values.username,
         password: values.password,
-        tipe_user: "staff"
+        tipe_user: "staff",
       };
       if (editingStaff) {
         // Edit mode
@@ -133,7 +148,9 @@ const KelolaStaf = () => {
               openNotificationWithIcon(
                 "success",
                 "Staff",
-                editingStaff ? "Staff berhasil diubah!" : "Staff berhasil ditambah!"
+                editingStaff
+                  ? "Staff berhasil diubah!"
+                  : "Staff berhasil ditambah!"
               );
               // Refresh data staff setelah create/update
               getDataPrivate("/api/v1/users/").then((data) => {
@@ -158,18 +175,21 @@ const KelolaStaf = () => {
           });
       } else {
         // Tambah mode
-        fetch(import.meta.env.VITE_REACT_APP_API_URL + "/api/v1/users/register", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "ngrok-skip-browser-warning": "69420",
-          },
-          body: JSON.stringify({
-            username: values.username,
-            password: values.password,
-            tipe_user: "staff"
-          }),
-        })
+        fetch(
+          import.meta.env.VITE_REACT_APP_API_URL + "/api/v1/users/register",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "ngrok-skip-browser-warning": "69420",
+            },
+            body: JSON.stringify({
+              username: values.username,
+              password: values.password,
+              tipe_user: "staff",
+            }),
+          }
+        )
           .then(async (res) => {
             setShowModal(false);
             setTimeout(() => form.resetFields(), 300);
@@ -204,26 +224,42 @@ const KelolaStaf = () => {
 
   // Assign puskesmas modal handlers
   function openAssignModal(staff) {
-    getDataPrivate(`/api/v1/health_center_staff/${staff.id_user}`).then((assigned) => {
-      setAssignModal({ open: true, staff, assigned: Array.isArray(assigned) ? assigned : assigned.data || [] });
-    });
+    getDataPrivate(`/api/v1/health_center_staff/${staff.id_user}`).then(
+      (assigned) => {
+        setAssignModal({
+          open: true,
+          staff,
+          assigned: Array.isArray(assigned) ? assigned : assigned.data || [],
+        });
+      }
+    );
   }
   function handleAssignPuskesmas(selectedPuskesmas) {
     sendDataPrivate("/api/v1/health_center_staff/", {
       id_user: assignModal.staff.id_user,
-      id_puskesmas: selectedPuskesmas
-    }).then(() => {
-      openNotificationWithIcon("success", "Puskesmas", "Assignment berhasil disimpan!");
-      setAssignModal({ open: false, staff: null, assigned: [] });
-      // Refresh assignment semua staff
-      getDataPrivate("/api/v1/users/").then((data) => {
-        let arr = Array.isArray(data) ? data : data.data || [];
-        const staff = arr.filter((u) => u.tipe_user === "staff");
-        refreshAllStaffAssignments(staff);
+      id_puskesmas: selectedPuskesmas,
+    })
+      .then(() => {
+        openNotificationWithIcon(
+          "success",
+          "Puskesmas",
+          "Assignment berhasil disimpan!"
+        );
+        setAssignModal({ open: false, staff: null, assigned: [] });
+        // Refresh assignment semua staff
+        getDataPrivate("/api/v1/users/").then((data) => {
+          let arr = Array.isArray(data) ? data : data.data || [];
+          const staff = arr.filter((u) => u.tipe_user === "staff");
+          refreshAllStaffAssignments(staff);
+        });
+      })
+      .catch(() => {
+        openNotificationWithIcon(
+          "error",
+          "Puskesmas",
+          "Gagal menyimpan assignment!"
+        );
       });
-    }).catch(() => {
-      openNotificationWithIcon("error", "Puskesmas", "Gagal menyimpan assignment!");
-    });
   }
 
   return (
@@ -346,7 +382,9 @@ const KelolaStaf = () => {
                     .join("")}
                 </Avatar>
                 <div>
-                  <div style={{ fontWeight: 600, fontSize: 20 }}>{s.username}</div>
+                  <div style={{ fontWeight: 600, fontSize: 20 }}>
+                    {s.username}
+                  </div>
                 </div>
               </div>
               {/* Status jika ada */}
@@ -356,15 +394,21 @@ const KelolaStaf = () => {
                 </div>
               )}
               {/* Assignment Puskesmas */}
-              <div style={{ margin: '8px 0' }}>
-                <EnvironmentOutlined style={{ color: mainColor, marginRight: 4 }} />
-                <span style={{ fontSize: 14, color: '#555' }}>
+              <div style={{ margin: "8px 0" }}>
+                <EnvironmentOutlined
+                  style={{ color: mainColor, marginRight: 4 }}
+                />
+                <span style={{ fontSize: 14, color: "#555" }}>
                   {s.puskesmasAssigned && s.puskesmasAssigned.length > 0
-                    ? s.puskesmasAssigned.map(id => {
-                        const p = puskesmasList.find(p => p.id_puskesmas === id);
-                        return p ? p.nama_puskesmas : id;
-                      }).join(', ')
-                    : 'Belum di-assign'}
+                    ? s.puskesmasAssigned
+                        .map((id) => {
+                          const p = puskesmasList.find(
+                            (p) => p.id_puskesmas === id
+                          );
+                          return p ? p.nama_puskesmas : id;
+                        })
+                        .join(", ")
+                    : "Belum di-assign"}
                 </span>
               </div>
               <div
@@ -481,22 +525,28 @@ const KelolaStaf = () => {
       </Modal>
       {/* Modal Assign Puskesmas */}
       <Modal
-        title={`Atur Puskesmas untuk ${assignModal.staff?.username || ''}`}
+        title={`Atur Puskesmas untuk ${assignModal.staff?.username || ""}`}
         open={assignModal.open}
-        onCancel={() => setAssignModal({ open: false, staff: null, assigned: [] })}
+        onCancel={() =>
+          setAssignModal({ open: false, staff: null, assigned: [] })
+        }
         onOk={() => handleAssignPuskesmas(assignModal.assigned)}
         okText="Simpan"
         cancelText="Batal"
       >
         <Select
           mode="multiple"
-          style={{ width: '100%' }}
+          style={{ width: "100%" }}
           placeholder="Pilih puskesmas"
           value={assignModal.assigned}
-          onChange={arr => setAssignModal(modal => ({ ...modal, assigned: arr }))}
+          onChange={(arr) =>
+            setAssignModal((modal) => ({ ...modal, assigned: arr }))
+          }
         >
-          {puskesmasList.map(p => (
-            <Select.Option key={p.id_puskesmas} value={p.id_puskesmas}>{p.nama_puskesmas}</Select.Option>
+          {puskesmasList.map((p) => (
+            <Select.Option key={p.id_puskesmas} value={p.id_puskesmas}>
+              {p.nama_puskesmas}
+            </Select.Option>
           ))}
         </Select>
       </Modal>

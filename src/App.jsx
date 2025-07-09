@@ -9,19 +9,19 @@ import LoginPage from "./pages/Login";
 import PrivateRoute from "./components/layout/PrivateRoute";
 import LandingPage from "./pages/LandingPage";
 import RegisterPage from "./pages/Register";
-import Main from './components/layout/Main';
-import DashboardPatient from './pages/Patient/Dashboard/DashboardPatient';
-import BookingPatient from './pages/Patient/Booking/BookingPatient';
-import AppointmentsPatient from './pages/Patient/Appointments/AppointmentsPatient';
-import ProfilePatient from './pages/Patient/Profile/ProfilePatient';
-import AdminDashboard from './pages/Admin/AdminDashboard';
-import DashboardAdmin from './pages/Admin/DashboardAdmin';
-import ReservationAdmin from './pages/Admin/ReservationAdmin';
-import KelolaLayanan from './pages/Admin/KelolaLayanan';
-import DataDokter from './pages/Admin/DataDokter';
-import DataPasien from './pages/Admin/DataPasien';
-import KelolaStaf from './pages/Admin/KelolaStaf';
-import Laporan from './pages/Admin/Laporan';
+import Main from "./components/layout/Main";
+import DashboardPatient from "./pages/Patient/Dashboard/DashboardPatient";
+import BookingPatient from "./pages/Patient/Booking/BookingPatient";
+import AppointmentsPatient from "./pages/Patient/Appointments/AppointmentsPatient";
+import ProfilePatient from "./pages/Patient/Profile/ProfilePatient";
+import AdminDashboard from "./pages/Admin/AdminDashboard";
+import DashboardAdmin from "./pages/Admin/DashboardAdmin";
+import ReservationAdmin from "./pages/Admin/ReservationAdmin";
+import KelolaLayanan from "./pages/Admin/KelolaLayanan";
+import DataDokter from "./pages/Admin/DataDokter";
+import KelolaPuskesmas from "./pages/Admin/KelolaPuskesmas";
+import KelolaStaf from "./pages/Admin/KelolaStaf";
+import Laporan from "./pages/Admin/Laporan";
 import StaffReservations from "./pages/Staff/StaffReservations";
 import StaffLayout from "./components/layout/StaffLayout";
 import StaffDashboard from "./pages/Staff/StaffDashboard";
@@ -48,7 +48,7 @@ function App() {
         <Route path="reservasi" element={<ReservationAdmin />} />
         <Route path="layanan" element={<KelolaLayanan />} />
         <Route path="dokter" element={<DataDokter />} />
-        <Route path="pasien" element={<DataPasien />} />
+        <Route path="puskesmas" element={<KelolaPuskesmas />} />
         <Route path="staf" element={<KelolaStaf />} />
         <Route path="laporan" element={<Laporan />} />
         <Route index element={<Navigate to="dashboard" replace />} />
@@ -61,7 +61,6 @@ function App() {
         <Route path="history" element={<RiwayatReservasiStaff />} />
       </Route>
 
-     
       <Route
         exact
         path="/profile"

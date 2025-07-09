@@ -238,12 +238,14 @@ const KelolaLayanan = () => {
       title: "Nama Layanan",
       dataIndex: "nama_layanan",
       key: "nama_layanan",
-      render: (text) => <span style={{ fontWeight: 600 }}>{text}</span>,
+      render: (text) => <span>{text}</span>,
+      sorter: (a, b) => a.nama_layanan.localeCompare(b.nama_layanan),
     },
     {
       title: "Deskripsi",
       dataIndex: "deskripsi",
       key: "deskripsi",
+      sorter: (a, b) => a.deskripsi.localeCompare(b.deskripsi),
     },
     {
       title: "Tarif",
@@ -257,6 +259,7 @@ const KelolaLayanan = () => {
           })}
         </span>
       ),
+      sorter: (a, b) => parseFloat(a.tarif) - parseFloat(b.tarif),
     },
     {
       title: "Aksi",
@@ -313,9 +316,19 @@ const KelolaLayanan = () => {
               Manajemen data layanan puskesmas
             </div>
           </Col>
-          {/* Hapus tombol Tambah Layanan lama di header */}
+          <Col xs={24} md={12} style={{ textAlign: "right" }}>
+            <Button
+              type="primary"
+              icon={<PlusOutlined />}
+              style={{ background: mainColor, borderColor: mainColor }}
+              onClick={handleAdd}
+            >
+              Tambah Layanan
+            </Button>
+          </Col>
         </Row>
-        <Row style={{ marginBottom: 16 }}>
+        {/* Hapus search bar */}
+        {/* <Row style={{ marginBottom: 16 }}>
           <Col xs={24} md={8}>
             <Input.Search
               placeholder="Cari layanan atau deskripsi..."
@@ -325,19 +338,7 @@ const KelolaLayanan = () => {
               style={{ maxWidth: 350 }}
             />
           </Col>
-        </Row>
-        {/* Tombol tambah layanan di atas */}
-        <Button
-          type="primary"
-          style={{
-            marginBottom: 16,
-            background: mainColor,
-            borderColor: mainColor,
-          }}
-          onClick={handleAdd}
-        >
-          Tambah Layanan
-        </Button>
+        </Row> */}
         <Card
           style={{
             border: `2px solid ${mainColor}`,
