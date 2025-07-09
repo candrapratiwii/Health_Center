@@ -20,9 +20,7 @@ const HeaderMain = ({ onLogout, notificationsCount = 3, title = 'Layanan Puskesm
           <span className="header-patient-badge">{notificationsCount}</span>
         )}
       </div>
-      <button className="header-patient-logout" onClick={onLogout}>
-        <LogOut size={20} /> Keluar
-      </button>
+      {/* Hapus tombol logout di sini */}
     </div>
   </header>
 );

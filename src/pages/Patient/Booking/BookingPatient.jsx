@@ -124,8 +124,9 @@ const BookingPatient = () => {
     }
   }, [showBookingForm]);
 
+  // Ubah extractKecamatan agar hanya ambil kata pertama (nama kecamatan saja)
   function extractKecamatan(nama) {
-    return nama.split(' ').slice(0, -1).join(' ');
+    return nama.split(' ')[0];
   }
   const kecamatanList = [
     ...new Set(puskesmasData.map(p => extractKecamatan(p.nama_puskesmas)))
@@ -163,6 +164,20 @@ const BookingPatient = () => {
     }
   };
 
+  // Tambahkan style inline pada tombol 'Pilih' agar saat hover berubah biru dan membesar
+  // Gunakan style object agar mudah di-maintain
+  const chooseBtnStyle = {
+    background: '#539e97',
+    color: '#fff',
+    border: 'none',
+    borderRadius: '6px',
+    padding: '0.5rem 1.5rem',
+    fontWeight: 600,
+    fontSize: '1rem',
+    cursor: 'pointer',
+    transition: 'background 0.2s, transform 0.2s',
+  };
+
   return (
     <div className="booking-patient">
       {contextHolder}
@@ -189,39 +204,63 @@ const BookingPatient = () => {
             ))}
           </select>
         </div>
-        {isLoading && <div>Loading data puskesmas...</div>}
+        {isLoading && (
+          <div style={{padding: '2rem 0', textAlign: 'center', color: '#888', fontSize: 18}}>
+            Loading data puskesmas...
+          </div>
+        )}
         {error && <div style={{color: 'red'}}>Error: {error}</div>}
-        <div className="puskesmas-list">
-          {!isLoading && !error && filteredPuskesmas.map(puskesmas => (
-            <div key={puskesmas.id} className="puskesmas-card">
-              <div className="puskesmas-icon"><Stethoscope color="#fff" /></div>
-              <div className="puskesmas-info">
-                <h4 style={{textAlign: 'center'}}>{puskesmas.nama_puskesmas}</h4>
-                <p style={{fontSize: '0.97rem'}}><MapPin size={16} style={{marginRight: 4}} />{puskesmas.alamat}</p>
-                <p style={{fontSize: '0.97rem'}}><Phone size={15} style={{marginRight: 4}} />{puskesmas.nomor_kontak}</p>
-                <p>Jam Operasional: {new Date(puskesmas.jam_operasional).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })}</p>
-                <p>Dokter: {doctorsMap[puskesmas.id_dokter] || '-'}</p>
+        {/* Pesan kosong di tengah card besar, grid card tetap normal jika ada data */}
+        {!isLoading && !error && filteredPuskesmas.length === 0 ? (
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            minHeight: 200,
+            width: '100%',
+            background: '#fff',
+            borderRadius: 20,
+            marginTop: 24,
+            boxShadow: '0 2px 8px #e8ecf8'
+          }}>
+            <span style={{color: '#888', fontSize: 16, textAlign: 'center'}}>
+              Tidak ada puskesmas yang ditemukan.
+            </span>
+          </div>
+        ) : (
+          <div className="puskesmas-list">
+            {filteredPuskesmas.map(puskesmas => (
+              <div key={puskesmas.id} className="puskesmas-card">
+                <div className="puskesmas-icon"><Stethoscope color="#fff" /></div>
+                <div className="puskesmas-info">
+                  <h4 style={{textAlign: 'center'}}>{puskesmas.nama_puskesmas}</h4>
+                  <p style={{fontSize: '0.97rem'}}><MapPin size={16} style={{marginRight: 4}} />{puskesmas.alamat}</p>
+                  <p style={{fontSize: '0.97rem'}}><Phone size={15} style={{marginRight: 4}} />{puskesmas.nomor_kontak}</p>
+                  {/* <p>Jam Operasional: {new Date(puskesmas.jam_operasional).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })}</p> */}
+                  <p>Dokter: {doctorsMap[puskesmas.id_dokter] || '-'}</p>
+                </div>
+                <div className="puskesmas-actions">
+                  <button
+                    onClick={() => {
+                      setSelectedPuskesmas(puskesmas);
+                      setInitialDataBooking({
+                        selectedPuskesmas: puskesmas,
+                        selectedLayanan: '',
+                        selectedTanggal: '',
+                        selectedJam: ''
+                      });
+                      setShowBookingForm(true);
+                    }}
+                    className="choose-btn"
+                    style={chooseBtnStyle}
+                  >
+                    Pilih
+                  </button>
+                </div>
               </div>
-              <div className="puskesmas-actions">
-                <button
-                  onClick={() => {
-                    setSelectedPuskesmas(puskesmas);
-                    setInitialDataBooking({
-                      selectedPuskesmas: puskesmas,
-                      selectedLayanan: '',
-                      selectedTanggal: '',
-                      selectedJam: ''
-                    });
-                    setShowBookingForm(true);
-                  }}
-                  className="choose-btn"
-                >
-                  Pilih
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
       {showBookingForm && selectedPuskesmas && (
         <BookingFormModal

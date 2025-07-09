@@ -105,9 +105,10 @@ function Header({
             gap: 16,
           }}
         >
-          <Button type="link" onClick={showDrawer}>
+          {/* Hapus icon notifikasi/setting */}
+          {/* <Button type="link" onClick={showDrawer}>
             {logsetting}
-          </Button>
+          </Button> */}
           <Button
             type="link"
             className="sidebar-toggler"
@@ -115,7 +116,8 @@ function Header({
           >
             {toggler}
           </Button>
-          <Button
+          {/* Hapus tombol logout */}
+          {/* <Button
             className="btn-sign-in"
             type="text"
             onClick={logout}
@@ -123,7 +125,7 @@ function Header({
             title="Logout"
           >
             <LogoutOutlined /> Logout
-          </Button>
+          </Button> */}
         </Col>
       </Row>
       <Drawer

@@ -1,6 +1,7 @@
 import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Home, Calendar, Clock, User } from 'lucide-react';
+import { Home, Calendar, Clock, User, LogOut } from 'lucide-react';
+import { Popconfirm } from 'antd';
 
 const navItems = [
   { id: 'dashboard', label: 'Dashboard', icon: Home, path: '/patien/dashboard' },
@@ -11,6 +12,13 @@ const navItems = [
 const PasienSidenav = () => {
   const navigate = useNavigate();
   const location = useLocation();
+
+  // Fungsi logout sederhana: hapus token dan redirect ke login
+  const handleLogout = () => {
+    localStorage.clear();
+    sessionStorage.clear();
+    window.location.href = '/login';
+  };
 
   return (
     <aside className="sidebar-patient">
@@ -38,14 +46,21 @@ const PasienSidenav = () => {
         })}
       </nav>
       <div className="sidebar-footer">
-        <button
-          className={`sidebar-nav-item${location.pathname === '/patien/profile' ? ' active' : ''}`}
-          onClick={() => navigate('/patien/profile')}
-          style={{ width: '100%', justifyContent: 'flex-start' }}
+        <Popconfirm
+          title="Logout"
+          description="Apakah Anda yakin ingin logout?"
+          onConfirm={handleLogout}
+          okText="Ya, Logout"
+          cancelText="Batal"
         >
-          <User className="sidebar-nav-icon" />
-          <span>Profil Saya</span>
-        </button>
+          <button
+            className="sidebar-nav-item"
+            style={{ width: '100%', justifyContent: 'flex-start', color: '#d32f2f' }}
+          >
+            <LogOut className="sidebar-nav-icon" />
+            <span>Logout</span>
+          </button>
+        </Popconfirm>
       </div>
     </aside>
   );

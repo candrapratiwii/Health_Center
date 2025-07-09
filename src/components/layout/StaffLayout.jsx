@@ -3,9 +3,9 @@ import StaffSidenav from "./sidenav/StaffSidenav";
 import { Outlet } from "react-router-dom";
 
 const StaffLayout = () => (
-  <div style={{ display: "flex", minHeight: "100vh", background: "#f6fafd" }}>
+  <div style={{ minHeight: "100vh", background: "#f6fafd" }}>
     <StaffSidenav />
-    <div style={{ flex: 1, minHeight: "100vh", background: "#f6fafd", display: 'flex', flexDirection: 'column' }}>
+    <div style={{ flex: 1, minHeight: "100vh", background: "#f6fafd", display: 'flex', flexDirection: 'column', marginLeft: 220 }}>
       <div style={{ flex: 1 }}>
         <Outlet />
       </div>

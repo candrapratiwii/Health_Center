@@ -8,13 +8,16 @@ const BookingFormModal = ({ visible, onClose, onSubmit, initialData = {}, puskes
   const tanggal = Form.useWatch('tanggal', form);
 
   useEffect(() => {
-    if (visible && initialData) {
-      form.setFieldsValue({
-        puskesmas: initialData.selectedPuskesmas ? (initialData.selectedPuskesmas.id_puskesmas) : '',
-        layanan: initialData.selectedLayanan || '',
-        tanggal: initialData.selectedTanggal || '',
-        jam: initialData.selectedJam || ''
-      });
+    if (visible) {
+      form.resetFields(); // Reset form setiap modal dibuka
+      if (initialData) {
+        form.setFieldsValue({
+          puskesmas: initialData.selectedPuskesmas ? (initialData.selectedPuskesmas.id_puskesmas) : '',
+          layanan: typeof initialData.selectedLayanan === 'string' ? initialData.selectedLayanan : '',
+          tanggal: initialData.selectedTanggal || '',
+          jam: typeof initialData.selectedJam === 'string' ? initialData.selectedJam : ''
+        });
+      }
     }
   }, [visible, initialData, form]);
 
@@ -77,14 +80,14 @@ const BookingFormModal = ({ visible, onClose, onSubmit, initialData = {}, puskes
         <Form form={form} layout="vertical" onFinish={handleFinish}>
           <div className="modal-body">
             <Form.Item label="Puskesmas" name="puskesmas">
-              <Select disabled={mode === 'edit'}>
+              <Select disabled>
                 {puskesmasList.map(p => (
                   <Select.Option key={p.id_puskesmas} value={p.id_puskesmas}>{p.nama_puskesmas}</Select.Option>
                 ))}
               </Select>
             </Form.Item>
             <Form.Item label="Jenis Layanan" name="layanan" rules={[{ required: true, message: 'Pilih layanan' }]}> 
-              <Select placeholder="Pilih layanan" disabled={mode === 'edit'}>
+              <Select placeholder="Pilih layanan">
                 {servicesList.map(service => (
                   <Select.Option key={service.id_layanan} value={String(service.id_layanan)}>{service.nama_layanan}</Select.Option>
                 ))}

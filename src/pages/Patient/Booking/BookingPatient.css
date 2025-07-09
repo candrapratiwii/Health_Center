@@ -152,6 +152,12 @@
   background: linear-gradient(90deg, #0e9488 0%, #047e9a 100%);
   transform: scale(1.06);
 }
+.choose-btn:hover {
+  background: #7c9cd6 !important;
+  color: #fff !important;
+  transform: scale(1.07);
+  transition: background 0.2s, transform 0.2s;
+}
 .booking-modal {
   position: fixed;
   inset: 0;

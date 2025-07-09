@@ -4,12 +4,25 @@ import './AppointmentsPatient.css';
 import BookingFormModal from '../Booking/BookingFormModal';
 import { getDataPrivate, sendDataPrivate, editDataPrivatePut } from '../../../utils/api';
 import { AuthContext } from '../../../providers/AuthProvider';
-import { notification, Popconfirm } from 'antd';
+import { notification, Popconfirm, Skeleton } from 'antd';
 
 const formatQueueNumber = (number) => {
   if (!number) return 'Belum ada';
   return number.toString().padStart(3, '0');
 };
+
+// Fungsi untuk normalisasi tanggal ke format YYYY-MM-DD
+function normalizeDate(dateStr) {
+  if (!dateStr) return '';
+  // Jika sudah ISO, langsung return
+  if (/^\d{4}-\d{2}-\d{2}/.test(dateStr)) return dateStr;
+  // Jika format DD/MM/YYYY
+  if (/^\d{2}\/\d{2}\/\d{4}/.test(dateStr)) {
+    const [day, month, year] = dateStr.split('/');
+    return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+  }
+  return dateStr; // fallback
+}
 
 const AppointmentsPatient = () => {
   const { userProfile, isLoadingScreen } = useContext(AuthContext);
@@ -50,13 +63,30 @@ const AppointmentsPatient = () => {
     });
   }, [userProfile]);
 
+  // Tambahkan efek loading setiap kali statusFilter berubah
+  useEffect(() => {
+    setLoading(true);
+    const timeout = setTimeout(() => setLoading(false), 400); // Skeleton muncul 400ms
+    return () => clearTimeout(timeout);
+  }, [statusFilter]);
+
   if (isLoadingScreen || !userProfile || !userProfile.id_user) {
     return <div>Loading user...</div>;
   }
 
-  const filteredAppointments = statusFilter === 'all'
+  const filteredAppointments = (statusFilter === 'all'
     ? appointments
-    : appointments.filter(a => a.status === statusFilter);
+    : appointments.filter(a => a.status === statusFilter)
+  ).slice().sort((a, b) => {
+    // Handle jika tanggal_reservasi atau waktu_antrian kosong
+    const getDateTime = (item) => {
+      if (!item.tanggal_reservasi) return Infinity; // letakkan di bawah jika tidak ada tanggal
+      const jam = item.waktu_antrian && item.waktu_antrian.length >= 5 ? item.waktu_antrian : '00:00';
+      const normDate = normalizeDate(item.tanggal_reservasi);
+      return new Date(`${normDate}T${jam}`);
+    };
+    return getDateTime(a) - getDateTime(b);
+  });
 
   const handleReschedule = (appointment) => {
     if (!puskesmasList.length || !servicesList.length) {
@@ -129,46 +159,88 @@ const AppointmentsPatient = () => {
   <div className="appointments-patient">
     <h3>Reservasi Saya</h3>
       <div style={{ marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
-        <label htmlFor="statusFilter">Filter Status:</label>
-        <select
-          id="statusFilter"
-          value={statusFilter}
-          onChange={e => setStatusFilter(e.target.value)}
-          style={{ padding: '0.4rem 1rem', borderRadius: '0.5rem', border: '1px solid #e0e7ef' }}
-        >
-          <option value="all">Semua</option>
-          <option value="confirmed">Terkonfirmasi</option>
-          <option value="pending">Menunggu</option>
-          <option value="cancelled">Dibatalkan</option>
-        </select>
+        <span>Filter Status:</span>
+        <button
+          onClick={() => setStatusFilter('all')}
+          style={{
+            padding: '0.4rem 1rem',
+            borderRadius: '0.5rem',
+            border: '1px solid #e0e7ef',
+            background: statusFilter === 'all' ? '#1976d2' : '#f5f7fa', // biru saat aktif
+            color: statusFilter === 'all' ? '#fff' : '#333',
+            fontWeight: statusFilter === 'all' ? 700 : 400,
+            cursor: 'pointer'
+          }}
+        >Semua</button>
+        <button
+          onClick={() => setStatusFilter('confirmed')}
+          style={{
+            padding: '0.4rem 1rem',
+            borderRadius: '0.5rem',
+            border: '1px solid #e0e7ef',
+            background: statusFilter === 'confirmed' ? '#388e3c' : '#f5f7fa',
+            color: statusFilter === 'confirmed' ? '#fff' : '#333',
+            fontWeight: statusFilter === 'confirmed' ? 700 : 400,
+            cursor: 'pointer'
+          }}
+        >Terkonfirmasi</button>
+        <button
+          onClick={() => setStatusFilter('pending')}
+          style={{
+            padding: '0.4rem 1rem',
+            borderRadius: '0.5rem',
+            border: '1px solid #e0e7ef',
+            background: statusFilter === 'pending' ? '#bfa100' : '#f5f7fa',
+            color: statusFilter === 'pending' ? '#fff' : '#333',
+            fontWeight: statusFilter === 'pending' ? 700 : 400,
+            cursor: 'pointer'
+          }}
+        >Menunggu</button>
+        <button
+          onClick={() => setStatusFilter('cancelled')}
+          style={{
+            padding: '0.4rem 1rem',
+            borderRadius: '0.5rem',
+            border: '1px solid #e0e7ef',
+            background: statusFilter === 'cancelled' ? '#d32f2f' : '#f5f7fa',
+            color: statusFilter === 'cancelled' ? '#fff' : '#333',
+            fontWeight: statusFilter === 'cancelled' ? 700 : 400,
+            cursor: 'pointer'
+          }}
+        >Dibatalkan</button>
       </div>
-      {loading ? <div>Loading data reservasi...</div> : null}
-    <div className="appointments-list">
-        {filteredAppointments.map(appointment => {
-          const isCancelled = appointment.status === 'cancelled';
-          return (
-            <div
-              key={appointment.id_antrian}
-              className="appointment-item"
-              style={{
-                display: 'flex',
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-                alignItems: 'flex-start',
-                background: isCancelled ? '#f3f3f3' : '#fff',
-                opacity: isCancelled ? 0.6 : 1,
-                pointerEvents: isCancelled ? 'none' : 'auto',
-                filter: isCancelled ? 'grayscale(0.5)' : 'none'
-              }}
-            >
-              <div className="appointment-info" style={{flexGrow: 1}}>
-                <h4>{appointment.nama_puskesmas || '-'}</h4>
-                <p>Dr. {appointment.nama_dokter || '-'}</p>
-                <p>{appointment.nama_layanan || '-'}</p>
-                <div>
-                  <span>Tanggal: {appointment.tanggal_reservasi ? new Date(appointment.tanggal_reservasi).toLocaleDateString('id-ID') : '-'}</span><br />
-                  <span>Waktu: {appointment.waktu_antrian || '-'}</span><br />
-                  <span>No. Antrian: {appointment.nomor_antrian || '-'}</span>
+      {/* Loading sederhana untuk semua filter */}
+      {loading ? (
+        <div style={{padding: '2rem 0', textAlign: 'center', color: '#888', fontSize: 18}}>
+          Loading data reservasi...
+        </div>
+      ) : (
+        <div className="appointments-list">
+          {filteredAppointments.map(appointment => {
+            const isCancelled = appointment.status === 'cancelled';
+            return (
+              <div
+                key={appointment.id_antrian}
+                className="appointment-item"
+                style={{
+                  display: 'flex',
+                  flexDirection: 'row',
+                  justifyContent: 'space-between',
+                  alignItems: 'flex-start',
+                  background: isCancelled ? '#f3f3f3' : '#fff',
+                  opacity: isCancelled ? 0.6 : 1,
+                  pointerEvents: isCancelled ? 'none' : 'auto',
+                  filter: isCancelled ? 'grayscale(0.5)' : 'none'
+                }}
+              >
+                <div className="appointment-info" style={{flexGrow: 1}}>
+                  <h4>{appointment.nama_puskesmas || '-'}</h4>
+                  <p>Dr. {appointment.nama_dokter || '-'}</p>
+                  <p>{appointment.nama_layanan || '-'}</p>
+                  <div>
+                    <span>Tanggal: {appointment.tanggal_reservasi ? new Date(appointment.tanggal_reservasi).toLocaleDateString('id-ID') : '-'}</span><br />
+                    <span>Waktu: {appointment.waktu_antrian || '-'}</span><br />
+                    <span>No. Antrian: {appointment.nomor_antrian || '-'}</span>
           </div>
                 <div style={{marginTop: '0.5rem', display: 'flex', gap: '0.5rem'}}>
                   <button
@@ -225,12 +297,15 @@ const AppointmentsPatient = () => {
 );
         })}
       </div>
+      )}
       {contextHolder}
       <BookingFormModal
         visible={rescheduleModal.open && !!puskesmasList.length && !!servicesList.length}
         onClose={() => setRescheduleModal({ open: false, appointment: null })}
         onSubmit={async ({ selectedPuskesmas, selectedLayanan, selectedTanggal, selectedJam }) => {
-          if (!selectedLayanan || !selectedTanggal || !selectedJam) {
+          // Gunakan jam lama jika selectedJam kosong
+          const jamToSend = selectedJam || rescheduleModal.appointment.waktu_antrian;
+          if (!selectedLayanan || !selectedTanggal || !jamToSend) {
             api.error({ message: 'Lengkapi semua data' });
             return;
           }
@@ -239,7 +314,7 @@ const AppointmentsPatient = () => {
             await editDataPrivatePut(`/api/v1/reservations/${rescheduleModal.appointment.id_reservasi}`, {
               id_puskesmas: selectedPuskesmas?.kode_faskes || selectedPuskesmas?.id_puskesmas,
               id_layanan: parseInt(selectedLayanan, 10),
-              tanggal_reservasi: `${selectedTanggal}T${selectedJam}:00`
+              tanggal_reservasi: `${selectedTanggal}T${jamToSend}:00`
             });
             api.success({ message: 'Reservasi berhasil diubah' });
             setRescheduleModal({ open: false, appointment: null });

@@ -33,45 +33,8 @@ const Main = () => {
       <Sidenav />
       <div className="main-content">
         {isDashboard && (
-          <div style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            gap: '2rem',
-            padding: '1.2rem 2rem 0.5rem 2rem',
-            background: 'transparent',
-          }}>
-            <div style={{textAlign: 'left'}}>
-              <h2 style={{margin: 0, fontSize: '2rem', fontWeight: 700, color: '#14b8a6'}}>Selamat Datang, {username}</h2>
-              <p style={{margin: 0, fontSize: '1.1rem', fontWeight: 400, opacity: 0.95, color: '#0891b2'}}>Kelola kesehatan Anda dengan mudah melalui sistem reservasi Puskesmas Buleleng</p>
-            </div>
-            <div style={{display: 'flex', alignItems: 'center', gap: '1.5rem'}}>
-              <button style={{ background: 'none', border: 'none', cursor: 'pointer', position: 'relative' }}>
-                <Bell size={22} />
-                <span style={{
-                  position: 'absolute',
-                  top: '-6px',
-                  right: '-6px',
-                  background: '#ef4444',
-                  color: '#fff',
-                  borderRadius: '50%',
-                  fontSize: '0.7rem',
-                  width: '18px',
-                  height: '18px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontWeight: 600
-                }}>3</span>
-              </button>
-              <button
-                style={{ background: '#ef4444', color: '#fff', border: 'none', borderRadius: '8px', padding: '0.5rem 1.1rem', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem' }}
-                onClick={logout}
-              >
-                <LogOut size={18} /> Logout
-              </button>
-            </div>
-          </div>
+          // Hapus header hijau dan subjudul di atas dashboard pasien
+          null
         )}
         <div className="main-body">
           <Outlet />
