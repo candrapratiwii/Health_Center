@@ -1,14 +1,35 @@
 import React, { useEffect, useState, useContext } from "react";
 import { AuthContext } from "../../providers/AuthProvider";
 import { getDataPrivate } from "../../utils/api";
-import { notification, Card, Tag, Divider } from "antd";
-import { CalendarOutlined, UserOutlined, CheckCircleOutlined, StopOutlined } from "@ant-design/icons";
+import { notification, Tag } from "antd";
 
 const mainColor = "#14b8a6";
 const accentColor = "#06b6d4";
 const statusTag = {
-  confirmed: <Tag color="green" style={{ fontWeight: 600, fontSize: 14, padding: '2px 16px' }}>Terkonfirmasi</Tag>,
-  cancelled: <Tag color="#b0b0b0" style={{ fontWeight: 600, fontSize: 14, padding: '2px 16px' }}>Dibatalkan</Tag>
+  confirmed: (
+    <Tag
+      color="green"
+      style={{ fontWeight: 600, fontSize: 14, padding: "2px 16px" }}
+    >
+      Terkonfirmasi
+    </Tag>
+  ),
+  cancelled: (
+    <Tag
+      color="#b0b0b0"
+      style={{ fontWeight: 600, fontSize: 14, padding: "2px 16px" }}
+    >
+      Dibatalkan
+    </Tag>
+  ),
+  pending: (
+    <Tag
+      color="#bfa100"
+      style={{ fontWeight: 600, fontSize: 14, padding: "2px 16px" }}
+    >
+      Menunggu
+    </Tag>
+  ),
 };
 
 const RiwayatReservasiStaff = () => {
@@ -17,25 +38,21 @@ const RiwayatReservasiStaff = () => {
   const [loading, setLoading] = useState(true);
   const [api, contextHolder] = notification.useNotification();
   const [puskesmasList, setPuskesmasList] = useState([]);
-  const [servicesList, setServicesList] = useState([]);
+  const [statusFilter, setStatusFilter] = useState("all");
 
   useEffect(() => {
     if (!userProfile?.id_user) return;
     let interval;
     const fetchData = () => {
       setLoading(true);
-      getDataPrivate('/api/v1/health_centers').then((data) => {
+      getDataPrivate("/api/v1/health_centers").then((data) => {
         let arr = Array.isArray(data) ? data : data.data || [];
         setPuskesmasList(arr);
-      });
-      getDataPrivate('/api/v1/services').then((data) => {
-        let arr = Array.isArray(data) ? data : data.data || [];
-        setServicesList(arr);
       });
       getDataPrivate(`/api/v1/reservations/staff/${userProfile.id_user}`)
         .then((data) => {
           const arr = Array.isArray(data) ? data : data.data || [];
-          setReservations(arr.filter(r => r.status === 'confirmed' || r.status === 'cancelled'));
+          setReservations(arr);
           setLoading(false);
         })
         .catch(() => {
@@ -51,81 +68,204 @@ const RiwayatReservasiStaff = () => {
   if (userProfile.tipe_user !== "staff") return <div>Akses ditolak</div>;
 
   const getPuskesmasName = (id) => {
-    const p = puskesmasList.find(p => p.id_puskesmas === id || p.kode_faskes === id);
+    const p = puskesmasList.find(
+      (p) => p.id_puskesmas === id || p.kode_faskes === id
+    );
     return p ? p.nama_puskesmas : id;
   };
-  const getLayananName = (id) => {
-    const s = servicesList.find(s => s.id_layanan === id);
-    return s ? s.nama_layanan : id;
-  };
+
+  // Filter data sesuai status
+  const filteredReservations =
+    statusFilter === "all"
+      ? reservations
+      : reservations.filter((r) => r.status === statusFilter);
 
   return (
     <div style={{ background: "#f6fafd", minHeight: "100vh", padding: 0 }}>
       {contextHolder}
-      <div style={{ maxWidth: 1200, margin: '0 auto', padding: '40px 16px' }}>
-        <h2 style={{ color: mainColor, fontWeight: 800, fontSize: 32, marginBottom: 0, letterSpacing: 0.5 }}>Riwayat Reservasi</h2>
-        <div style={{ color: "#555", marginBottom: 24, fontSize: 17, fontWeight: 400 }}>Reservasi yang sudah dikonfirmasi atau dibatalkan. Data ini hanya untuk referensi dan tidak dapat diubah.</div>
-        <Divider style={{ margin: '16px 0 32px 0', borderColor: mainColor, borderWidth: 2 }} />
+      <div style={{ maxWidth: 1200, margin: "0 auto", padding: "40px 32px" }}>
+        <h2
+          style={{
+            color: mainColor,
+            fontWeight: 800,
+            fontSize: 32,
+            marginBottom: 0,
+            letterSpacing: 0.5,
+          }}
+        >
+          Riwayat Reservasi
+        </h2>
+        <div
+          style={{
+            color: "#555",
+            marginBottom: 24,
+            fontSize: 17,
+            fontWeight: 400,
+          }}
+        >
+          Daftar reservasi pasien di puskesmas yang Anda kelola. Filter data
+          sesuai kebutuhan.
+        </div>
+        <div
+          style={{
+            marginBottom: "1.5rem",
+            display: "flex",
+            alignItems: "center",
+            gap: "1rem",
+          }}
+        >
+          <span>Filter Status:</span>
+          <button
+            onClick={() => setStatusFilter("all")}
+            style={{
+              padding: "0.4rem 1rem",
+              borderRadius: "0.5rem",
+              border: "1px solid #e0e7ef",
+              background: statusFilter === "all" ? "#1976d2" : "#f5f7fa",
+              color: statusFilter === "all" ? "#fff" : "#333",
+              fontWeight: statusFilter === "all" ? 700 : 400,
+              cursor: "pointer",
+            }}
+          >
+            Semua
+          </button>
+          <button
+            onClick={() => setStatusFilter("confirmed")}
+            style={{
+              padding: "0.4rem 1rem",
+              borderRadius: "0.5rem",
+              border: "1px solid #e0e7ef",
+              background: statusFilter === "confirmed" ? "#388e3c" : "#f5f7fa",
+              color: statusFilter === "confirmed" ? "#fff" : "#333",
+              fontWeight: statusFilter === "confirmed" ? 700 : 400,
+              cursor: "pointer",
+            }}
+          >
+            Terkonfirmasi
+          </button>
+          <button
+            onClick={() => setStatusFilter("pending")}
+            style={{
+              padding: "0.4rem 1rem",
+              borderRadius: "0.5rem",
+              border: "1px solid #e0e7ef",
+              background: statusFilter === "pending" ? "#bfa100" : "#f5f7fa",
+              color: statusFilter === "pending" ? "#fff" : "#333",
+              fontWeight: statusFilter === "pending" ? 700 : 400,
+              cursor: "pointer",
+            }}
+          >
+            Menunggu
+          </button>
+          <button
+            onClick={() => setStatusFilter("cancelled")}
+            style={{
+              padding: "0.4rem 1rem",
+              borderRadius: "0.5rem",
+              border: "1px solid #e0e7ef",
+              background: statusFilter === "cancelled" ? "#d32f2f" : "#f5f7fa",
+              color: statusFilter === "cancelled" ? "#fff" : "#333",
+              fontWeight: statusFilter === "cancelled" ? 700 : 400,
+              cursor: "pointer",
+            }}
+          >
+            Dibatalkan
+          </button>
+        </div>
         {loading ? (
-          <div style={{ textAlign: 'center', marginTop: 64 }}>
-            <img src="/src/assets/images/hamster.gif" alt="loading" style={{ width: 60, opacity: 0.5, marginBottom: 16 }} />
-            <div style={{ color: '#888', fontSize: 18 }}>Loading data...</div>
+          <div style={{ textAlign: "center", marginTop: 64 }}>
+            <div style={{ color: "#888", fontSize: 18 }}>Loading data...</div>
           </div>
-        ) : reservations.length === 0 ? (
-          <div style={{ color: '#888', fontSize: 18, textAlign: 'center', marginTop: 64 }}>
-            <img src="https://cdn-icons-png.flaticon.com/512/4076/4076549.png" alt="empty" style={{ width: 80, opacity: 0.3, marginBottom: 16 }} />
-            <div>Tidak ada riwayat reservasi ditemukan.</div>
+        ) : filteredReservations.length === 0 ? (
+          <div
+            style={{
+              color: "#888",
+              fontSize: 18,
+              textAlign: "center",
+              marginTop: 64,
+            }}
+          >
+            <div>Tidak ada reservasi ditemukan.</div>
           </div>
         ) : (
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))',
-            gap: 32
-          }}>
-            {reservations.map((r) => (
-              <Card
+          <div className="appointments-list" style={{ gap: "2rem" }}>
+            {filteredReservations.map((r) => (
+              <div
                 key={r.id_reservasi}
+                className="appointment-item"
                 style={{
-                  borderRadius: 20,
-                  boxShadow: "0 4px 24px #0002",
-                  border: `1.5px solid ${mainColor}10`,
-                  background: r.status === 'cancelled' ? '#f8f8f8' : '#fff',
-                  opacity: r.status === 'cancelled' ? 0.7 : 1,
-                  minHeight: 200,
-                  transition: 'box-shadow 0.2s',
-                  cursor: 'pointer',
+                  display: "flex",
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  alignItems: "flex-start",
+                  background: r.status === "cancelled" ? "#f3f3f3" : "#fff",
+                  opacity: r.status === "cancelled" ? 0.6 : 1,
+                  pointerEvents: r.status === "cancelled" ? "none" : "auto",
+                  filter: r.status === "cancelled" ? "grayscale(0.5)" : "none",
                 }}
-                bodyStyle={{ padding: 28, paddingBottom: 18 }}
-                hoverable
               >
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                    <CalendarOutlined style={{ color: accentColor, fontSize: 22, marginRight: 4 }} />
-                    <span style={{ fontWeight: 700, fontSize: 20, color: mainColor, letterSpacing: 0.2 }}>{getPuskesmasName(r.id_puskesmas)}</span>
+                <div className="appointment-info" style={{ flexGrow: 1 }}>
+                  <h4>{getPuskesmasName(r.id_puskesmas)}</h4>
+                  <p>{r.layanan || "-"}</p>
+                  <div>
+                    <span>
+                      Nomor Antrian:{" "}
+                      {r.nomor_antrian
+                        ? r.nomor_antrian.toString().padStart(3, "0")
+                        : "-"}
+                    </span>
+                    <br />
+                    <span>Tanggal: {r.tanggal_reservasi}</span>
+                    <br />
                   </div>
-                  {statusTag[r.status] || <Tag>{r.status}</Tag>}
                 </div>
-                <div style={{ color: '#555', fontSize: 16, marginBottom: 8, fontWeight: 500, display: 'flex', alignItems: 'center', gap: 8 }}>
-                  <UserOutlined style={{ color: accentColor, fontSize: 16 }} />
-                  {getLayananName(r.id_layanan)}
+                <div
+                  className="appointment-meta"
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "flex-end",
+                    textAlign: "right",
+                    minWidth: "120px",
+                  }}
+                >
+                  <span
+                    className={`status ${r.status}`}
+                    style={{
+                      background:
+                        r.status === "confirmed"
+                          ? "#e0ffe0"
+                          : r.status === "cancelled"
+                          ? "#eee"
+                          : "#fffbe0",
+                      color:
+                        r.status === "cancelled"
+                          ? "#888"
+                          : r.status === "confirmed"
+                          ? "#388e3c"
+                          : "#bfa100",
+                      padding: "2px 10px",
+                      borderRadius: 8,
+                      fontWeight: 600,
+                      fontSize: 14,
+                    }}
+                  >
+                    {r.status === "confirmed"
+                      ? "Terkonfirmasi"
+                      : r.status === "cancelled"
+                      ? "Dibatalkan"
+                      : "Menunggu"}
+                  </span>
+                  <span
+                    className={`queue-number ${r.status}`}
+                    style={{ marginTop: "0.4rem" }}
+                  >
+                    {r.nomor_antrian
+                      ? r.nomor_antrian.toString().padStart(3, "0")
+                      : "-"}
+                  </span>
                 </div>
-                <div style={{ color: '#888', fontSize: 15, marginBottom: 8 }}>
-                  <b>Tanggal:</b> {r.tanggal_reservasi}
-                </div>
-                <div style={{ color: '#888', fontSize: 15, marginBottom: 8 }}>
-                  <b>ID Reservasi:</b> {r.id_reservasi}
-                </div>
-                {r.status === 'confirmed' && (
-                  <div style={{ color: accentColor, fontWeight: 600, fontSize: 15, display: 'flex', alignItems: 'center', gap: 6, marginTop: 8 }}>
-                    <CheckCircleOutlined style={{ color: accentColor }} /> Terkonfirmasi
-                  </div>
-                )}
-                {r.status === 'cancelled' && (
-                  <div style={{ color: '#b0b0b0', fontWeight: 600, fontSize: 15, display: 'flex', alignItems: 'center', gap: 6, marginTop: 8 }}>
-                    <StopOutlined style={{ color: '#b0b0b0' }} /> Dibatalkan
-                  </div>
-                )}
-              </Card>
+              </div>
             ))}
           </div>
         )}
@@ -134,4 +274,4 @@ const RiwayatReservasiStaff = () => {
   );
 };
 
-export default RiwayatReservasiStaff; 
+export default RiwayatReservasiStaff;
