@@ -296,24 +296,6 @@ const KelolaStaf = () => {
           Tambah Staff
         </Button>
       </div>
-      {/* Summary Card hanya total staff */}
-      <div
-        style={{ display: "flex", gap: 24, marginBottom: 24, flexWrap: "wrap" }}
-      >
-        <Card
-          style={{
-            flex: 1,
-            minWidth: 180,
-            textAlign: "center",
-            boxShadow: "0 2px 8px #0001",
-          }}
-        >
-          <div style={{ fontSize: 32, color: mainColor, fontWeight: 700 }}>
-            {totalStaff}
-          </div>
-          <div style={{ color: "#888" }}>Total Staff</div>
-        </Card>
-      </div>
       {/* Search Bar hanya username */}
       <div style={{ marginBottom: 24 }}>
         <Input

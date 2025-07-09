@@ -318,9 +318,20 @@ const KelolaLayanan = () => {
           </Col>
           <Col xs={24} md={12} style={{ textAlign: "right" }}>
             <Button
-              type="primary"
-              icon={<PlusOutlined />}
-              style={{ background: mainColor, borderColor: mainColor }}
+              type="default"
+              icon={<PlusOutlined style={{ color: mainColor }} />}
+              style={{
+                background: "#fff",
+                color: mainColor,
+                borderWidth: 2,
+                borderStyle: "solid",
+                borderRadius: 18,
+                fontWeight: 600,
+                borderImage:
+                  "linear-gradient(90deg, #14b8a6 0%, #06b6d4 100%) 1",
+                borderImageSlice: 1,
+                boxShadow: "none",
+              }}
               onClick={handleAdd}
             >
               Tambah Layanan
