@@ -92,6 +92,7 @@ const KelolaLayanan = () => {
             "Layanan",
             "Layanan berhasil dihapus!"
           );
+          window.location.reload();
         } else {
           openNotificationWithIcon(
             "error",
@@ -162,6 +163,7 @@ const KelolaLayanan = () => {
                 "Layanan",
                 "Layanan berhasil diubah!"
               );
+              window.location.reload();
             } else {
               let errMsg = "Gagal mengubah layanan.";
               try {
@@ -204,6 +206,7 @@ const KelolaLayanan = () => {
                 "Layanan",
                 "Layanan berhasil ditambah!"
               );
+              window.location.reload();
             } else {
               let errMsg = "Gagal menambah layanan.";
               try {

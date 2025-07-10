@@ -243,13 +243,7 @@ const KelolaPuskesmas = () => {
             setShowModal(false);
             setTimeout(() => form.resetFields(), 300);
             if (res.ok) {
-              setPuskesmas((prevData) =>
-                prevData.map((item) =>
-                  item.id_puskesmas === editingPuskesmas.id_puskesmas
-                    ? { ...item, ...payload }
-                    : item
-                )
-              );
+              getDataPuskesmas();
               openNotificationWithIcon(
                 "success",
                 "Puskesmas",

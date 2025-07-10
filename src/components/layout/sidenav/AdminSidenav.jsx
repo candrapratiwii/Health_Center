@@ -11,6 +11,7 @@ import {
 } from "@ant-design/icons";
 import { AuthContext } from "../../../providers/AuthProvider";
 import { Popconfirm, message } from "antd";
+import logoMain from "../../../assets/images/Green Modern Badge Gardening Logo Design.png";
 
 function AdminSidenav({ color }) {
   const { logout } = useContext(AuthContext);
@@ -69,7 +70,9 @@ function AdminSidenav({ color }) {
           style={{ cursor: "pointer" }}
           onClick={() => useNavigate()("/admin/dashboard")}
         >
-          <div className="sidebar-logo">A</div>
+          <div className="sidebar-logo">
+            <img src={logoMain} alt="Logo" style={{ width: 40, height: 40 }} />
+          </div>
           <div>
             <div className="sidebar-title">Admin Puskesmas</div>
             <div className="sidebar-desc">Manajemen Sistem</div>

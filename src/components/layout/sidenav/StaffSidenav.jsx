@@ -1,12 +1,33 @@
 import React from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { HomeOutlined, FileTextOutlined, HistoryOutlined, LogoutOutlined } from "@ant-design/icons";
+import {
+  HomeOutlined,
+  FileTextOutlined,
+  HistoryOutlined,
+  LogoutOutlined,
+} from "@ant-design/icons";
 import { Popconfirm } from "antd";
+import logoMain from "../../../assets/images/Green Modern Badge Gardening Logo Design.png";
 
 const navItems = [
-  { id: 'dashboard', label: 'Dashboard', icon: <HomeOutlined className="sidebar-nav-icon" />, path: '/staff/dashboard' },
-  { id: 'reservations', label: 'Data Reservasi', icon: <FileTextOutlined className="sidebar-nav-icon" />, path: '/staff/reservations' },
-  { id: 'history', label: 'Riwayat Reservasi', icon: <HistoryOutlined className="sidebar-nav-icon" />, path: '/staff/history' }
+  {
+    id: "dashboard",
+    label: "Dashboard",
+    icon: <HomeOutlined className="sidebar-nav-icon" />,
+    path: "/staff/dashboard",
+  },
+  {
+    id: "reservations",
+    label: "Data Reservasi",
+    icon: <FileTextOutlined className="sidebar-nav-icon" />,
+    path: "/staff/reservations",
+  },
+  {
+    id: "history",
+    label: "Riwayat Reservasi",
+    icon: <HistoryOutlined className="sidebar-nav-icon" />,
+    path: "/staff/history",
+  },
 ];
 
 const StaffSidenav = () => {
@@ -16,25 +37,27 @@ const StaffSidenav = () => {
   const handleLogout = () => {
     localStorage.clear();
     sessionStorage.clear();
-    window.location.href = '/login';
+    window.location.href = "/login";
   };
 
   return (
     <aside className="sidebar-patient">
       <div className="sidebar-header">
-        <span className="sidebar-logo">S</span>
+        <span className="sidebar-logo">
+          <img src={logoMain} alt="Logo" style={{ width: 40, height: 40 }} />
+        </span>
         <div>
           <h1 className="sidebar-title">Staff Center</h1>
           <p className="sidebar-desc">Sistem Reservasi</p>
         </div>
       </div>
       <nav className="sidebar-nav">
-        {navItems.map(item => {
+        {navItems.map((item) => {
           const isActive = location.pathname === item.path;
           return (
             <button
               key={item.id}
-              className={`sidebar-nav-item${isActive ? ' active' : ''}`}
+              className={`sidebar-nav-item${isActive ? " active" : ""}`}
               onClick={() => navigate(item.path)}
             >
               {item.icon}
@@ -53,7 +76,11 @@ const StaffSidenav = () => {
         >
           <button
             className="sidebar-nav-item"
-            style={{ width: '100%', justifyContent: 'flex-start', color: '#d32f2f' }}
+            style={{
+              width: "100%",
+              justifyContent: "flex-start",
+              color: "#d32f2f",
+            }}
           >
             <LogoutOutlined className="sidebar-nav-icon" />
             <span>Logout</span>

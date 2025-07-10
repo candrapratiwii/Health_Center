@@ -43,83 +43,70 @@ const Laporan = () => {
   const [pasienPerPuskesmas, setPasienPerPuskesmas] = useState([]);
   const [loadingStatPuskesmas, setLoadingStatPuskesmas] = useState(true);
 
+  // Gabungkan seluruh statistik ke dalam satu useEffect realtime
   useEffect(() => {
-    async function fetchPasien() {
-      setLoadingPasien(true);
-      setErrorPasien(null);
+    setLoadingPasien(true);
+    setLoadingDokter(true);
+    setLoadingLayanan(true);
+    setLoadingPuskesmas(true);
+    setErrorPasien(null);
+    setErrorDokter(null);
+    setErrorLayanan(null);
+    setErrorPuskesmas(null);
+    async function fetchAllStats() {
       try {
-        // Ambil data reservasi
-        const reservationsResp = await getDataPrivate("/api/v1/reservations/");
+        const [reservationsResp, dokterResp, layananResp, puskesmasResp] =
+          await Promise.all([
+            getDataPrivate("/api/v1/reservations/"),
+            getDataPrivate("/api/v1/doctors"),
+            getDataPrivate("/api/v1/services"),
+            getDataPrivate("/api/v1/health_centers"),
+          ]);
+        // Total pasien: hanya user yang punya reservasi status confirmed (unik per id_user)
         let reservations = Array.isArray(reservationsResp)
           ? reservationsResp
           : reservationsResp.data || [];
-        // Filter hanya yang status confirmed
         const confirmed = reservations.filter((r) => r.status === "confirmed");
-        // Ambil id_user unik
         const uniqueUserIds = [...new Set(confirmed.map((r) => r.id_user))];
         setTotalPasien(uniqueUserIds.length);
+        setLoadingPasien(false);
+        // Total dokter
+        let dokterArr = Array.isArray(dokterResp)
+          ? dokterResp
+          : dokterResp.data || [];
+        setTotalDokter(dokterArr.length);
+        setLoadingDokter(false);
+        // Total layanan
+        let layananArr = Array.isArray(layananResp)
+          ? layananResp
+          : layananResp.data || [];
+        setTotalLayanan(layananArr.length);
+        setLoadingLayanan(false);
+        // Total puskesmas
+        let puskesmasArr = Array.isArray(puskesmasResp)
+          ? puskesmasResp
+          : puskesmasResp.data || [];
+        setTotalPuskesmas(puskesmasArr.length);
+        setLoadingPuskesmas(false);
       } catch (err) {
         setErrorPasien(err.message);
         setTotalPasien(0);
-      } finally {
         setLoadingPasien(false);
-      }
-    }
-    fetchPasien();
-  }, []);
-
-  useEffect(() => {
-    async function fetchDokter() {
-      setLoadingDokter(true);
-      setErrorDokter(null);
-      try {
-        const resp = await getDataPrivate("/api/v1/doctors");
-        let arr = Array.isArray(resp) ? resp : resp.data || [];
-        setTotalDokter(arr.length);
-      } catch (err) {
         setErrorDokter(err.message);
         setTotalDokter(0);
-      } finally {
         setLoadingDokter(false);
-      }
-    }
-    fetchDokter();
-  }, []);
-
-  useEffect(() => {
-    async function fetchLayanan() {
-      setLoadingLayanan(true);
-      setErrorLayanan(null);
-      try {
-        const resp = await getDataPrivate("/api/v1/services");
-        let arr = Array.isArray(resp) ? resp : resp.data || [];
-        setTotalLayanan(arr.length);
-      } catch (err) {
         setErrorLayanan(err.message);
         setTotalLayanan(0);
-      } finally {
         setLoadingLayanan(false);
-      }
-    }
-    fetchLayanan();
-  }, []);
-
-  useEffect(() => {
-    async function fetchPuskesmas() {
-      setLoadingPuskesmas(true);
-      setErrorPuskesmas(null);
-      try {
-        const resp = await getDataPrivate("/api/v1/health_centers");
-        let arr = Array.isArray(resp) ? resp : resp.data || [];
-        setTotalPuskesmas(arr.length);
-      } catch (err) {
         setErrorPuskesmas(err.message);
         setTotalPuskesmas(0);
-      } finally {
         setLoadingPuskesmas(false);
       }
     }
-    fetchPuskesmas();
+    fetchAllStats();
+    // Optional: polling untuk realtime, misal setiap 15 detik
+    const interval = setInterval(fetchAllStats, 15000);
+    return () => clearInterval(interval);
   }, []);
 
   // Statistik pasien per puskesmas dari reservasi confirmed

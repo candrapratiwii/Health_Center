@@ -52,6 +52,7 @@ const KelolaStaf = () => {
     staff: null,
     assigned: [],
   });
+  const [assignPuskesmas, setAssignPuskesmas] = useState([]); // State untuk puskesmas yang dipilih di modal tambah/edit
 
   // Helper untuk refresh assignment semua staff
   async function refreshAllStaffAssignments(staffList) {
@@ -74,7 +75,9 @@ const KelolaStaf = () => {
   useEffect(() => {
     getDataPrivate("/api/v1/users/").then((data) => {
       let arr = Array.isArray(data) ? data : data.data || [];
-      const staff = arr.filter((u) => (u.tipe_user || '').toLowerCase() === "staff");
+      const staff = arr.filter(
+        (u) => (u.tipe_user || "").toLowerCase() === "staff"
+      );
       refreshAllStaffAssignments(staff);
     });
     getDataPrivate("/api/v1/health_centers").then((data) => {
@@ -98,11 +101,13 @@ const KelolaStaf = () => {
   function handleAdd() {
     setEditingStaff(null);
     form.resetFields();
+    setAssignPuskesmas([]); // Reset assign puskesmas
     setShowModal(true);
   }
   function handleEdit(staff) {
     setEditingStaff(staff);
     form.setFieldsValue(staff);
+    setAssignPuskesmas(staff.puskesmasAssigned || []); // Set assign puskesmas dari data staff
     setShowModal(true);
   }
   function handleDelete(id_user) {
@@ -111,7 +116,9 @@ const KelolaStaf = () => {
         // Setelah delete, refresh data staff
         getDataPrivate("/api/v1/users/").then((data) => {
           let arr = Array.isArray(data) ? data : data.data || [];
-          const staff = arr.filter((u) => (u.tipe_user || '').toLowerCase() === "staff");
+          const staff = arr.filter(
+            (u) => (u.tipe_user || "").toLowerCase() === "staff"
+          );
           setStaff(staff);
           message.success("Staf berhasil dihapus");
         });
@@ -120,62 +127,69 @@ const KelolaStaf = () => {
         message.error("Gagal menghapus staf");
       });
   }
-  function handleModalOk() {
-    form.validateFields().then((values) => {
-      const payload = {
-        username: values.username,
-        password: values.password,
-        tipe_user: "staff",
-      };
-      if (editingStaff) {
-        // Edit mode
-        fetch(
-          import.meta.env.VITE_REACT_APP_API_URL +
-            `/api/v1/users/${editingStaff.id_user}`,
-          {
-            method: "PUT",
-            headers: {
-              "Content-Type": "application/json",
-              "ngrok-skip-browser-warning": "69420",
-            },
-            body: JSON.stringify(payload),
-          }
-        )
-          .then(async (res) => {
-            setShowModal(false);
-            setTimeout(() => form.resetFields(), 300);
-            if (res.ok) {
-              openNotificationWithIcon(
-                "success",
-                "Staff",
-                editingStaff
-                  ? "Staff berhasil diubah!"
-                  : "Staff berhasil ditambah!"
+  async function handleModalOk() {
+    const values = await form.validateFields();
+    const payload = {
+      username: values.username,
+      password: values.password,
+      tipe_user: "staff",
+    };
+    if (editingStaff) {
+      // Edit mode
+      fetch(
+        import.meta.env.VITE_REACT_APP_API_URL +
+          `/api/v1/users/${editingStaff.id_user}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            "ngrok-skip-browser-warning": "69420",
+          },
+          body: JSON.stringify(payload),
+        }
+      )
+        .then(async (res) => {
+          setShowModal(false);
+          setTimeout(() => form.resetFields(), 300);
+          if (res.ok) {
+            openNotificationWithIcon(
+              "success",
+              "Staff",
+              editingStaff
+                ? "Staff berhasil diubah!"
+                : "Staff berhasil ditambah!"
+            );
+            // Refresh data staff setelah create/update
+            getDataPrivate("/api/v1/users/").then((data) => {
+              let arr = Array.isArray(data) ? data : data.data || [];
+              const staff = arr.filter(
+                (u) => (u.tipe_user || "").toLowerCase() === "staff"
               );
-              // Refresh data staff setelah create/update
-              getDataPrivate("/api/v1/users/").then((data) => {
-                let arr = Array.isArray(data) ? data : data.data || [];
-                const staff = arr.filter((u) => (u.tipe_user || '').toLowerCase() === "staff");
-                setStaff(staff);
-                setShowModal(false);
-                // Hapus window.location.reload();
-              });
-            } else {
-              openNotificationWithIcon(
-                "error",
-                "Staff",
-                "Gagal mengubah staff."
-              );
-            }
-          })
-          .catch(() => {
-            setShowModal(false);
-            setTimeout(() => form.resetFields(), 300);
+              setStaff(staff);
+              setShowModal(false);
+            });
+            // Update assignment puskesmas jika diubah
+            Promise.all(
+              assignPuskesmas.map((id_puskesmas) =>
+                sendDataPrivate("/api/v1/health_center_staff/", {
+                  id_user: editingStaff.id_user,
+                  id_puskesmas,
+                })
+              )
+            );
+          } else {
             openNotificationWithIcon("error", "Staff", "Gagal mengubah staff.");
-          });
-      } else {
-        // Tambah mode
-        fetch(
+          }
+        })
+        .catch(() => {
+          setShowModal(false);
+          setTimeout(() => form.resetFields(), 300);
+          openNotificationWithIcon("error", "Staff", "Gagal mengubah staff.");
+        });
+    } else {
+      // Tambah mode
+      try {
+        const res = await fetch(
           import.meta.env.VITE_REACT_APP_API_URL + "/api/v1/users/register",
           {
             method: "POST",
@@ -189,37 +203,63 @@ const KelolaStaf = () => {
               tipe_user: "staff",
             }),
           }
-        )
-          .then(async (res) => {
-            setShowModal(false);
-            setTimeout(() => form.resetFields(), 300);
-            if (res.ok) {
-              openNotificationWithIcon(
-                "success",
-                "Staff",
-                "Staff berhasil ditambah!"
+        );
+        setShowModal(false);
+        setTimeout(() => form.resetFields(), 300);
+        if (res.ok) {
+          const respData = await res.json();
+          const newStaffId = respData?.id_user || respData?.data?.id_user;
+          openNotificationWithIcon(
+            "success",
+            "Staff",
+            "Staff berhasil ditambah!"
+          );
+          // Refresh data staff
+          getDataPrivate("/api/v1/users/").then((data) => {
+            let arr = Array.isArray(data) ? data : data.data || [];
+            const staff = arr.filter(
+              (u) => (u.tipe_user || "").toLowerCase() === "staff"
+            );
+            setStaff(staff);
+          });
+          // Assign puskesmas ke staff baru
+          if (newStaffId && assignPuskesmas.length > 0) {
+            try {
+              await Promise.all(
+                assignPuskesmas.map((id_puskesmas) =>
+                  sendDataPrivate("/api/v1/health_center_staff/", {
+                    id_user: newStaffId,
+                    id_puskesmas,
+                  })
+                )
               );
-              // Refresh data staff
-              getDataPrivate("/api/v1/users/").then((data) => {
-                let arr = Array.isArray(data) ? data : data.data || [];
-                const staff = arr.filter((u) => (u.tipe_user || '').toLowerCase() === "staff");
-                setStaff(staff);
-              });
-            } else {
+              // Delay 500ms untuk memastikan backend commit
+              await new Promise((resolve) => setTimeout(resolve, 500));
+            } catch (err) {
               openNotificationWithIcon(
                 "error",
                 "Staff",
-                "Gagal menambah staff."
+                "Gagal assign puskesmas ke staff baru!"
               );
             }
-          })
-          .catch(() => {
-            setShowModal(false);
-            setTimeout(() => form.resetFields(), 300);
-            openNotificationWithIcon("error", "Staff", "Gagal menambah staff.");
-          });
+          }
+          // Refresh assignment staff agar assignment langsung muncul
+          const staffResp = await getDataPrivate("/api/v1/users/");
+          let arr = Array.isArray(staffResp) ? staffResp : staffResp.data || [];
+          const staffList = arr.filter(
+            (u) => (u.tipe_user || "").toLowerCase() === "staff"
+          );
+          await refreshAllStaffAssignments(staffList);
+          window.location.reload();
+        } else {
+          openNotificationWithIcon("error", "Staff", "Gagal menambah staff.");
+        }
+      } catch {
+        setShowModal(false);
+        setTimeout(() => form.resetFields(), 300);
+        openNotificationWithIcon("error", "Staff", "Gagal menambah staff.");
       }
-    });
+    }
   }
 
   // Assign puskesmas modal handlers
@@ -249,7 +289,9 @@ const KelolaStaf = () => {
         // Refresh assignment semua staff
         getDataPrivate("/api/v1/users/").then((data) => {
           let arr = Array.isArray(data) ? data : data.data || [];
-          const staff = arr.filter((u) => (u.tipe_user || '').toLowerCase() === "staff");
+          const staff = arr.filter(
+            (u) => (u.tipe_user || "").toLowerCase() === "staff"
+          );
           refreshAllStaffAssignments(staff);
         });
       })
@@ -501,6 +543,22 @@ const KelolaStaf = () => {
             rules={[{ required: true, message: "Password wajib diisi" }]}
           >
             <Input.Password />
+          </Form.Item>
+          {/* Pilih Puskesmas */}
+          <Form.Item label="Puskesmas Tempat Bertugas">
+            <Select
+              mode="multiple"
+              style={{ width: "100%" }}
+              placeholder="Pilih puskesmas"
+              value={assignPuskesmas}
+              onChange={setAssignPuskesmas}
+            >
+              {puskesmasList.map((p) => (
+                <Select.Option key={p.id_puskesmas} value={p.id_puskesmas}>
+                  {p.nama_puskesmas}
+                </Select.Option>
+              ))}
+            </Select>
           </Form.Item>
         </Form>
       </Modal>

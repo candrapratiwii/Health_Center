@@ -8,6 +8,7 @@ import {
   MedicineBoxOutlined,
 } from "@ant-design/icons";
 import landingImg from "../../assets/images/landing.jpg";
+import logoMain from "../../assets/images/Green Modern Badge Gardening Logo Design.png";
 
 const LandingPage = () => {
   const navigate = useNavigate();
@@ -61,7 +62,11 @@ const LandingPage = () => {
         <div className="nav-container">
           <div className="logo">
             <div className="logo-icon">
-              <MedicineBoxOutlined style={{ fontSize: 28, color: "#fff" }} />
+              <img
+                src={logoMain}
+                alt="Logo"
+                style={{ width: 64, height: 64 }}
+              />
             </div>
             <div className="logo-text">Reservasi Puskesmas</div>
           </div>

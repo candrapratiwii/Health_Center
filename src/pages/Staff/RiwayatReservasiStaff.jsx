@@ -39,6 +39,8 @@ const RiwayatReservasiStaff = () => {
   const [api, contextHolder] = notification.useNotification();
   const [puskesmasList, setPuskesmasList] = useState([]);
   const [statusFilter, setStatusFilter] = useState("all");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [patientsList, setPatientsList] = useState([]); // Tambahkan state untuk daftar pasien
 
   useEffect(() => {
     if (!userProfile?.id_user) return;
@@ -48,6 +50,10 @@ const RiwayatReservasiStaff = () => {
       getDataPrivate("/api/v1/health_centers").then((data) => {
         let arr = Array.isArray(data) ? data : data.data || [];
         setPuskesmasList(arr);
+      });
+      getDataPrivate("/api/v1/users/").then((data) => {
+        let arr = Array.isArray(data) ? data : data.data || [];
+        setPatientsList(arr);
       });
       getDataPrivate(`/api/v1/reservations/staff/${userProfile.id_user}`)
         .then((data) => {
@@ -67,18 +73,28 @@ const RiwayatReservasiStaff = () => {
   if (isLoadingScreen) return <div>Loading...</div>;
   if (userProfile.tipe_user !== "staff") return <div>Akses ditolak</div>;
 
-  const getPuskesmasName = (id) => {
-    const p = puskesmasList.find(
-      (p) => p.id_puskesmas === id || p.kode_faskes === id
-    );
-    return p ? p.nama_puskesmas : id;
+  // Fungsi mapping id_user ke username
+  const getUsername = (id_user) => {
+    const u = patientsList.find((u) => u.id_user === id_user);
+    return u ? u.username || u.nama || "-" : id_user;
   };
 
-  // Filter data sesuai status
+  // Filter data sesuai status dan search
   const filteredReservations =
     statusFilter === "all"
       ? reservations
       : reservations.filter((r) => r.status === statusFilter);
+
+  // Filter berdasarkan searchTerm
+  const searchedReservations =
+    searchTerm.trim() === ""
+      ? filteredReservations
+      : filteredReservations.filter((r) => {
+          const username = getUsername(r.id_user).toLowerCase();
+          const layanan = (r.layanan || "").toLowerCase();
+          const term = searchTerm.toLowerCase();
+          return username.includes(term) || layanan.includes(term);
+        });
 
   return (
     <div style={{ background: "#f6fafd", minHeight: "100vh", padding: 0 }}>
@@ -171,12 +187,27 @@ const RiwayatReservasiStaff = () => {
           >
             Dibatalkan
           </button>
+          {/* Search Bar */}
+          <input
+            type="text"
+            placeholder="Cari Nama atau layanan..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            style={{
+              marginLeft: "2rem",
+              padding: "0.4rem 1rem",
+              borderRadius: "0.5rem",
+              border: "1px solid #e0e7ef",
+              minWidth: 220,
+              fontSize: 15,
+            }}
+          />
         </div>
         {loading ? (
           <div style={{ textAlign: "center", marginTop: 64 }}>
             <div style={{ color: "#888", fontSize: 18 }}>Loading data...</div>
           </div>
-        ) : filteredReservations.length === 0 ? (
+        ) : searchedReservations.length === 0 ? (
           <div
             style={{
               color: "#888",
@@ -189,7 +220,7 @@ const RiwayatReservasiStaff = () => {
           </div>
         ) : (
           <div className="appointments-list" style={{ gap: "2rem" }}>
-            {filteredReservations.map((r) => (
+            {searchedReservations.map((r) => (
               <div
                 key={r.id_reservasi}
                 className="appointment-item"
@@ -205,7 +236,7 @@ const RiwayatReservasiStaff = () => {
                 }}
               >
                 <div className="appointment-info" style={{ flexGrow: 1 }}>
-                  <h4>{getPuskesmasName(r.id_puskesmas)}</h4>
+                  <h4>{getUsername(r.id_user)}</h4>
                   <p>{r.layanan || "-"}</p>
                   <div>
                     <span>

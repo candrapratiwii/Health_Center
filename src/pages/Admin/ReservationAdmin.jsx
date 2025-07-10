@@ -6,45 +6,35 @@ import { getDataPrivate } from "../../utils/api";
 const mainColor = "#14b8a6";
 const accentColor = "#06b6d4";
 
-// Referensi id ke nama puskesmas
-const puskesmasList = [
-  { id: 1, nama: "Buleleng I" },
-  { id: 2, nama: "Buleleng II" },
-  { id: 3, nama: "Sukasada I" },
-  { id: 4, nama: "Sukasada II" },
-  { id: 5, nama: "Sawan I" },
-  { id: 6, nama: "Sawan II" },
-  { id: 7, nama: "Banjar I" },
-  { id: 8, nama: "Banjar II" },
-  { id: 9, nama: "Seririt I" },
-  { id: 10, nama: "Seririt II" },
-  { id: 11, nama: "Tejakula" },
-  { id: 12, nama: "Kubutambahan" },
-  { id: 13, nama: "Busungbiu" },
-];
-
-const mapPuskesmasIdToNama = (id) => {
-  const found = puskesmasList.find((p) => p.id === id);
-  return found ? found.nama : "-";
-};
-
-const statusColor = {
-  pending: "gold",
-  accepted: "green",
-  rejected: "volcano",
-};
-
+// Ambil data puskesmas dari API
 const ReservationAdmin = () => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filterPuskesmas, setFilterPuskesmas] = useState("");
   const [userMap, setUserMap] = useState({});
+  const [puskesmasList, setPuskesmasList] = useState([]);
+  // Mapping nama puskesmas dengan array puskesmas sebagai argumen
+  const mapPuskesmasIdToNama = (id, arr) => {
+    let found = arr.find((p) => String(p.id_puskesmas) === String(id));
+    if (!found) {
+      found = arr.find((p) => String(p.kode_faskes) === String(id));
+    }
+    return found ? found.nama_puskesmas : "-";
+  };
 
   useEffect(() => {
     async function fetchData() {
       setLoading(true);
-      // Ambil semua user untuk mapping id_user ke username
-      const usersResp = await getDataPrivate("/api/v1/users/");
+      // Fetch semua data secara paralel
+      const [usersResp, puskesmasResp, reservationsResp, queuesResp] =
+        await Promise.all([
+          getDataPrivate("/api/v1/users/"),
+          getDataPrivate("/api/v1/health_centers/"),
+          getDataPrivate("/api/v1/reservations/"),
+          getDataPrivate("/api/v1/queues/"),
+        ]);
+
+      // Proses user
       let usersArr = Array.isArray(usersResp)
         ? usersResp
         : usersResp.data || [];
@@ -55,29 +45,36 @@ const ReservationAdmin = () => {
       });
       setUserMap(userMapObj);
 
-      // Ambil semua reservasi
-      const reservationsResp = await getDataPrivate("/api/v1/reservations/");
-      let reservations = Array.isArray(reservationsResp)
-        ? reservationsResp
-        : reservationsResp.data || [];
+      // Proses puskesmas
+      let puskesmasArr = Array.isArray(puskesmasResp)
+        ? puskesmasResp
+        : puskesmasResp.data || [];
+      puskesmasArr = puskesmasArr.map((item) => ({
+        ...item,
+        id_puskesmas: String(item.id_puskesmas),
+        kode_faskes: String(item.kode_faskes),
+        nama_puskesmas: String(item.nama_puskesmas),
+      }));
+      setPuskesmasList(puskesmasArr);
 
-      // Ambil semua queue sekaligus
-      const queuesResp = await getDataPrivate("/api/v1/queues/");
+      // Proses queue
       let queuesArr = Array.isArray(queuesResp)
         ? queuesResp
         : queuesResp.data || [];
-      // Buat map id_reservasi -> nomor_antrian
       const queueMap = {};
       queuesArr.forEach((q) => {
         if (q.id_reservasi) queueMap[q.id_reservasi] = q.nomor_antrian;
       });
 
-      // Gabungkan data
+      // Proses reservasi
+      let reservations = Array.isArray(reservationsResp)
+        ? reservationsResp
+        : reservationsResp.data || [];
       let mergedData = reservations.map((res) => ({
         id_user: res.id_user,
         nama_pasien: userMapObj[res.id_user] || "-",
         id_puskesmas: res.id_puskesmas,
-        nama_puskesmas: mapPuskesmasIdToNama(res.id_puskesmas),
+        nama_puskesmas: mapPuskesmasIdToNama(res.id_puskesmas, puskesmasArr),
         nomor_antrian: queueMap[res.id_reservasi] || "-",
         tanggal_reservasi: res.tanggal_reservasi
           ? new Date(res.tanggal_reservasi).toLocaleString("id-ID")
@@ -86,7 +83,6 @@ const ReservationAdmin = () => {
         status: res.status || "-",
         id_reservasi: res.id_reservasi || res.id || Math.random(),
       }));
-      // Urutkan berdasarkan tanggal_reservasi terbaru (descending)
       mergedData = mergedData.sort(
         (a, b) =>
           new Date(b._tanggal_reservasi_raw) -
