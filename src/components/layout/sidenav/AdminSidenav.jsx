@@ -10,9 +10,18 @@ import {
   LogoutOutlined,
 } from "@ant-design/icons";
 import { AuthContext } from "../../../providers/AuthProvider";
+import { Popconfirm, message } from "antd";
 
 function AdminSidenav({ color }) {
   const { logout } = useContext(AuthContext);
+
+  // Fungsi logout dengan notifikasi
+  const handleLogout = () => {
+    message.success("Berhasil logout");
+    setTimeout(() => {
+      logout();
+    }, 1000);
+  };
 
   const menu = [
     {
@@ -82,24 +91,31 @@ function AdminSidenav({ color }) {
         </nav>
       </div>
       <div className="sidebar-footer">
-        <button
-          className="sidebar-nav-item"
-          style={{
-            color: "#d32f2f",
-            width: "100%",
-            background: "none",
-            border: "none",
-            display: "flex",
-            alignItems: "center",
-            gap: 12,
-            fontWeight: 600,
-            fontSize: 16,
-            cursor: "pointer",
-          }}
-          onClick={logout}
+        <Popconfirm
+          title="Logout"
+          description="Apakah Anda yakin ingin logout?"
+          onConfirm={handleLogout}
+          okText="Ya, Logout"
+          cancelText="Batal"
         >
-          <LogoutOutlined className="sidebar-nav-icon" /> Logout
-        </button>
+          <button
+            className="sidebar-nav-item"
+            style={{
+              color: "#d32f2f",
+              width: "100%",
+              background: "none",
+              border: "none",
+              display: "flex",
+              alignItems: "center",
+              gap: 12,
+              fontWeight: 600,
+              fontSize: 16,
+              cursor: "pointer",
+            }}
+          >
+            <LogoutOutlined className="sidebar-nav-icon" /> Logout
+          </button>
+        </Popconfirm>
       </div>
     </div>
   );
