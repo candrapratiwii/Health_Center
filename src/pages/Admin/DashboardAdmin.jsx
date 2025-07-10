@@ -60,15 +60,15 @@ const DashboardAdmin = () => {
         year: "numeric",
         month: "long",
         day: "numeric",
-        timeZone: "Asia/Jakarta",
+        timeZone: "Asia/Makassar",
       };
       const timeOptions = {
         hour: "2-digit",
         minute: "2-digit",
-        timeZone: "Asia/Jakarta",
+        timeZone: "Asia/Makassar",
       };
       setDate(now.toLocaleDateString("id-ID", options));
-      setTime(now.toLocaleTimeString("id-ID", timeOptions) + " WIB");
+      setTime(now.toLocaleTimeString("id-ID", timeOptions) + " WITA");
     }
     updateDateTime();
     const interval = setInterval(updateDateTime, 1000);

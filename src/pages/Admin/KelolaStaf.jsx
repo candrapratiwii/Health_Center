@@ -33,7 +33,7 @@ const statusTag = {
   Nonaktif: <Tag color="red">Nonaktif</Tag>,
 };
 
-const pageSize = 3;
+const pageSize = 12;
 
 const KelolaStaf = () => {
   const [staff, setStaff] = useState([]);
@@ -74,7 +74,7 @@ const KelolaStaf = () => {
   useEffect(() => {
     getDataPrivate("/api/v1/users/").then((data) => {
       let arr = Array.isArray(data) ? data : data.data || [];
-      const staff = arr.filter((u) => u.tipe_user === "staff");
+      const staff = arr.filter((u) => (u.tipe_user || '').toLowerCase() === "staff");
       refreshAllStaffAssignments(staff);
     });
     getDataPrivate("/api/v1/health_centers").then((data) => {
@@ -111,7 +111,7 @@ const KelolaStaf = () => {
         // Setelah delete, refresh data staff
         getDataPrivate("/api/v1/users/").then((data) => {
           let arr = Array.isArray(data) ? data : data.data || [];
-          const staff = arr.filter((u) => u.tipe_user === "staff");
+          const staff = arr.filter((u) => (u.tipe_user || '').toLowerCase() === "staff");
           setStaff(staff);
           message.success("Staf berhasil dihapus");
         });
@@ -155,7 +155,7 @@ const KelolaStaf = () => {
               // Refresh data staff setelah create/update
               getDataPrivate("/api/v1/users/").then((data) => {
                 let arr = Array.isArray(data) ? data : data.data || [];
-                const staff = arr.filter((u) => u.tipe_user === "staff");
+                const staff = arr.filter((u) => (u.tipe_user || '').toLowerCase() === "staff");
                 setStaff(staff);
                 setShowModal(false);
                 // Hapus window.location.reload();
@@ -202,7 +202,7 @@ const KelolaStaf = () => {
               // Refresh data staff
               getDataPrivate("/api/v1/users/").then((data) => {
                 let arr = Array.isArray(data) ? data : data.data || [];
-                const staff = arr.filter((u) => u.role === "staff");
+                const staff = arr.filter((u) => (u.tipe_user || '').toLowerCase() === "staff");
                 setStaff(staff);
               });
             } else {
@@ -249,7 +249,7 @@ const KelolaStaf = () => {
         // Refresh assignment semua staff
         getDataPrivate("/api/v1/users/").then((data) => {
           let arr = Array.isArray(data) ? data : data.data || [];
-          const staff = arr.filter((u) => u.tipe_user === "staff");
+          const staff = arr.filter((u) => (u.tipe_user || '').toLowerCase() === "staff");
           refreshAllStaffAssignments(staff);
         });
       })
@@ -318,10 +318,9 @@ const KelolaStaf = () => {
       {/* Staff Grid */}
       <div
         style={{
-          display: "flex",
-          flexWrap: "wrap",
+          display: "grid",
+          gridTemplateColumns: "repeat(3, 1fr)",
           gap: 24,
-          justifyContent: "flex-start",
           minHeight: 200,
         }}
       >
